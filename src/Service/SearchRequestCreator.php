@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\SearchRequest;
 use App\Entity\User;
 use App\Enum\SearchRequestStatus;
+use App\Exception\AlreadyExistsException;
 use App\Repository\SearchRequestRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,14 +15,25 @@ class SearchRequestCreator
 {
     public function __construct(
         private SearchRequestRepository $searchRequestRepository,
-     ) {}
+    ) {
+    }
 
     /**
      * @param UserInterface|User $user
+     * @param string $fname
+     * @param string $lname
+     * @param string $city
+     * @param string|null $state
+     * @return SearchRequest
      * @throws AlreadyExistsException
      */
-    public function create(UserInterface $user, string $fname, string $lname, string $city, ?string $state)
-    {
+    public function create(
+        UserInterface $user,
+        string $fname,
+        string $lname,
+        string $city,
+        ?string $state,
+    ): SearchRequest {
         /** @var SearchRequest|null $res */
         $searchPeriod = new DateTime('-2 day'); // from 2 days until now
         $res = $this->searchRequestRepository->get($fname, $lname, $city, $state, $searchPeriod);
@@ -45,7 +57,7 @@ class SearchRequestCreator
         $request->setState($state);
         $request->setStatus(SearchRequestStatus::NEW);
         $request->setUsers(new ArrayCollection([$user]));
-        $request->setCreatedAt(new \DateTime());
+        $request->setCreatedAt(new DateTime());
         $user->addSearchRequests($request);
         $this->searchRequestRepository->save($request);
 
