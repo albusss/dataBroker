@@ -12,9 +12,8 @@ RUN apt-get install -y apt-utils libx11-6 libx11-xcb1 libxcb1 libxcomposite1 lib
 
 RUN apt-get install -y apt-utils libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libnss3 lsb-release xdg-utils
 
-
 RUN pecl install xdebug \
-    && docker-php-ext-install zip pdo pdo_mysql \
+    && docker-php-ext-install zip pdo pdo_mysql pcntl opcache \
     && docker-php-ext-enable xdebug
 
 #RUN apt-get update && apt-get install -y wget git unzip zip libzip-dev nodejs npm libgbm-dev \
