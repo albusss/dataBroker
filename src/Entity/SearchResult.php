@@ -2,46 +2,46 @@
 
 namespace App\Entity;
 
-use DateTime;
+use App\Repository\SearchResultRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- */
-class SearchResult
+#[ORM\Table(name: 'search_results')]
+#[ORM\Index(columns: ['search_request_id'], name: 'idx_search_request')]
+#[ORM\Index(columns: ['parser_name'], name: 'idx_parser_name')]
+#[ORM\Entity(repositoryClass: SearchResultRepository::class)]
+class SearchResult extends AbstractEntity
 {
-    use EntityTrait;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private string|null $parserName;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private string|null $fullname;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private string|null $address;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private string|null $link;
-
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
-    private string|null $age;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="SearchRequest", inversedBy="results")
-     * @ORM\JoinColumn(name="search_request_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: SearchRequest::class, inversedBy: 'searchResults')]
+    #[ORM\JoinColumn(name: 'search_request_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private SearchRequest $searchRequest;
+
+    #[ORM\Column(name: 'parser_name', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $parserName;
+
+    #[ORM\Column(name: 'full_name', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $fullName;
+
+    #[ORM\Column(name: 'address', type: Types::STRING, length: 255, nullable: true)]
+    private ?string $address;
+
+    #[ORM\Column(name: 'link', type: Types::STRING, length: 500, nullable: true)]
+    private ?string $link;
+
+    #[ORM\Column(name: 'age', type: Types::STRING, length: 30, nullable: true)]
+    private ?string $age;
+
+    public function getSearchRequest(): SearchRequest
+    {
+        return $this->searchRequest;
+    }
+
+    public function setSearchRequest(SearchRequest $searchRequest): self
+    {
+        $this->searchRequest = $searchRequest;
+
+        return $this;
+    }
 
     public function getParserName(): ?string
     {
@@ -55,14 +55,14 @@ class SearchResult
         return $this;
     }
 
-    public function getFullname(): ?string
+    public function getFullName(): ?string
     {
-        return $this->fullname;
+        return $this->fullName;
     }
 
-    public function setFullname(?string $name): self
+    public function setFullName(?string $fullName): self
     {
-        $this->fullname = $name;
+        $this->fullName = $fullName;
 
         return $this;
     }
@@ -79,33 +79,6 @@ class SearchResult
         return $this;
     }
 
-    public function getAge(): ?string
-    {
-        return $this->age;
-    }
-
-    public function setAge(?string $age): self
-    {
-        $this->age = $age;
-
-        return $this;
-    }
-
-    /**
-     * @return SearchRequest
-     */
-    public function getSearchRequest(): SearchRequest
-    {
-        return $this->searchRequest;
-    }
-
-    public function setSearchRequest(SearchRequest $searchRequest): self
-    {
-        $this->searchRequest = $searchRequest;
-
-        return $this;
-    }
-
     public function getLink(): ?string
     {
         return $this->link;
@@ -118,32 +91,15 @@ class SearchResult
         return $this;
     }
 
-    public static function fromParser(string $parserName, array $data, SearchRequest $result): self
+    public function getAge(): ?string
     {
-        $s = new self();
-
-        $s
-            ->setFullname((string) ($data['name'] ?? ''))
-            ->setAge((string) ($data['age'] ?? ''))
-            ->setAddress((string) ($data['location'] ?? ''))
-            ->setLink((string) ($data['link'] ?? ''))
-            ->setParserName($parserName)
-            ->setSearchRequest($result)
-            ->setCreatedAt(new DateTime());
-
-        return $s;
+        return $this->age;
     }
 
-    public static function forError(string $parserName, SearchRequest $result): self
+    public function setAge(?string $age): self
     {
-        $s = new self();
+        $this->age = $age;
 
-        $s
-            ->setFullname('No data or error. Please check manually')
-            ->setParserName($parserName)
-            ->setSearchRequest($result)
-            ->setCreatedAt(new DateTime());
-
-        return $s;
+        return $this;
     }
 }

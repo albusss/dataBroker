@@ -2,50 +2,44 @@
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * @ORM\Entity()
- */
+use function array_unique;
+
+#[ORM\Table(name: 'users')]
+#[ORM\UniqueConstraint(name: 'uniq_username', columns: ['username'])]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: 'id', type: Types::INTEGER)]
     private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
+    #[ORM\Column(name: 'username', type: Types::STRING, length: 255, unique: true, nullable: false)]
     private string $username;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
-
-    /**
-     * @ORM\Column(type="string")
-     */
+    #[ORM\Column(name: 'password', type: Types::STRING, length: 255, nullable: false)]
     private string $password;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="SearchRequest", inversedBy="users")
-     * @ORM\JoinTable(name="users_search_requests")
-     */
+    #[ORM\Column(name: 'roles', type: Types::JSON, nullable: false)]
+    private array $roles = [];
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchRequest::class, orphanRemoval: true)]
     private Collection $searchRequests;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->searchRequests = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -55,7 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return $this->username;
     }
 
     public function setUsername(string $username): self
@@ -72,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return $this->username;
     }
 
     /**
@@ -81,6 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
+
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
@@ -123,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
@@ -132,15 +127,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getSearchRequests(): Collection
     {
         return $this->searchRequests;
-    }
-
-    public function setSearchRequests(Collection $searchRequests): void
-    {
-        $this->searchRequests = $searchRequests;
-    }
-
-    public function addSearchRequests(SearchRequest $searchRequests): void
-    {
-        $this->searchRequests->add($searchRequests);
     }
 }

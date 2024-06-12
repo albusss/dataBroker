@@ -9,6 +9,12 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @method SearchRequest|null find($id, $lockMode = null, $lockVersion = null)
+ * @method SearchRequest|null findOneBy(array $criteria, array $orderBy = null)
+ * @method SearchRequest[]    findAll()
+ * @method SearchRequest[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class SearchRequestRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,7 +22,7 @@ class SearchRequestRepository extends ServiceEntityRepository
         parent::__construct($registry, SearchRequest::class);
     }
 
-    public function save(SearchRequest $searchRequest)
+    public function save(SearchRequest $searchRequest): void
     {
         $this->getEntityManager()->persist($searchRequest);
         $this->getEntityManager()->flush();
@@ -39,13 +45,4 @@ class SearchRequestRepository extends ServiceEntityRepository
             return null;
         }
     }
-//
-//    public function getLast(int $number, string $order): array
-//    {
-//        $qb = $this->createQueryBuilder('sr');
-//
-//        $qb
-//            ->join('user', 'u', 'on', 'u.id = sr.')
-//            ->where($qb->expr()->eq('sr.user', ':fname'))->setParameter('fname', $fname);
-//    }
 }
