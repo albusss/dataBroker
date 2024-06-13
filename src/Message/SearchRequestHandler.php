@@ -10,6 +10,7 @@ use App\Repository\SearchRequestRepository;
 use App\Repository\SearchResultRepository;
 use App\Service\ParserCreator;
 use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -19,6 +20,7 @@ class SearchRequestHandler
         private readonly ParserCreator $parserCreator,
         private readonly SearchRequestRepository $searchRequestRepository,
         private readonly SearchResultRepository $searchResultRepository,
+        private readonly LoggerInterface $parserLogger,
     ) {
     }
 
@@ -28,29 +30,31 @@ class SearchRequestHandler
             $searchRequest = $this->searchRequestRepository->find($message->requestId);
 
             if (!$searchRequest) {
-                throw new NotFoundException('Request "' . $message->requestId . '" not found');
+                throw new NotFoundException('Request #' . $message->requestId . ' not found');
             }
 
             $parser = $this->parserCreator->create($message->parserType);
-        } catch (NotFoundException) {
+        } catch (NotFoundException $e) {
+            $this->parserLogger->error($e->getMessage());
+
             return;
         }
 
-        $result = $parser->parse();
+        $response = $parser->parse();
 
         $searchResult = (new SearchResult())
             ->setSearchRequest($searchRequest)
             ->setParserName($parser->getName())
             ->setCreatedAt(new DateTimeImmutable());
 
-        if (!$result) {
+        if (!$response) {
             $searchResult->setFullName('No data or error. Please check manually.');
         } else {
             $searchResult
-                ->setFullName($result->fullName)
-                ->setAddress($result->address)
-                ->setLink($result->link)
-                ->setAge($result->age);
+                ->setFullName($response->fullName)
+                ->setAddress($response->address)
+                ->setLink($response->link)
+                ->setAge($response->age);
         }
 
         $this->searchResultRepository->save($searchResult);
