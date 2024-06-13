@@ -20,9 +20,8 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-        App\Service\ParserProxyProvider:
-            arguments:
-                $proxiesDSN: '%env(json:PROXIES_DSN)%'
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\Service\ParserProxyProvider:
+        arguments:
+            $proxiesDSN: '%env(json:PROXIES_DSN)%'

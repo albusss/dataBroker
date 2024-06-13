@@ -29,6 +29,8 @@ final class Version20240612154906 extends AbstractMigration
         CHANGE
           search_request_id search_request_id INT NOT NULL,
         CHANGE
+          parser_name parser_name VARCHAR(50) NOT NULL,
+        CHANGE
           created_at created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\',
         CHANGE
           fullname full_name VARCHAR(255) DEFAULT NULL');
@@ -41,8 +43,8 @@ final class Version20240612154906 extends AbstractMigration
         $this->addSql(/** @lang MySQL */'ALTER TABLE search_results RENAME INDEX idx_ca88ae0c9ac8886f TO idx_search_request');
         $this->addSql(/** @lang MySQL */'ALTER TABLE users CHANGE username username VARCHAR(255) NOT NULL');
         $this->addSql(/** @lang MySQL */'ALTER TABLE users RENAME INDEX uniq_8d93d649f85e0677 TO uniq_username');
-        $this->addSql(/** @lang MySQL */'ALTER TABLE user_search_requests DROP FOREIGN KEY FK_D0A7827EA76ED395');
         $this->addSql(/** @lang MySQL */'ALTER TABLE user_search_requests DROP FOREIGN KEY FK_D0A7827E9AC8886F');
+        $this->addSql(/** @lang MySQL */'ALTER TABLE user_search_requests DROP FOREIGN KEY FK_D0A7827EA76ED395');
         $this->addSql(/** @lang MySQL */'ALTER TABLE
           user_search_requests
         ADD
@@ -79,6 +81,8 @@ final class Version20240612154906 extends AbstractMigration
         CHANGE
           created_at created_at DATETIME NOT NULL,
         CHANGE
+          parser_name parser_name VARCHAR(255) DEFAULT NULL,
+        CHANGE
           full_name fullname VARCHAR(255) DEFAULT NULL');
         $this->addSql(/** @lang MySQL */'ALTER TABLE
           search_results
@@ -90,11 +94,11 @@ final class Version20240612154906 extends AbstractMigration
         $this->addSql(/** @lang MySQL */'ALTER TABLE
           user_search_requests
         ADD
-          CONSTRAINT FK_D0A7827EA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE');
+          CONSTRAINT FK_D0A7827E9AC8886F FOREIGN KEY (search_request_id) REFERENCES search_requests (id) ON DELETE CASCADE');
         $this->addSql(/** @lang MySQL */'ALTER TABLE
           user_search_requests
         ADD
-          CONSTRAINT FK_D0A7827E9AC8886F FOREIGN KEY (search_request_id) REFERENCES search_requests (id) ON DELETE CASCADE');
+          CONSTRAINT FK_D0A7827EA76ED395 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE');
         $this->addSql(/** @lang MySQL */'ALTER TABLE user_search_requests RENAME INDEX idx_790e116ba76ed395 TO IDX_D0A7827EA76ED395');
         $this->addSql(/** @lang MySQL */'ALTER TABLE user_search_requests RENAME INDEX idx_790e116b9ac8886f TO IDX_D0A7827E9AC8886F');
         $this->addSql(/** @lang MySQL */'ALTER TABLE users CHANGE username username VARCHAR(180) NOT NULL');

@@ -16,20 +16,20 @@ class SearchResult extends AbstractEntity
     #[ORM\JoinColumn(name: 'search_request_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private SearchRequest $searchRequest;
 
-    #[ORM\Column(name: 'parser_name', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $parserName;
+    #[ORM\Column(name: 'parser_name', type: Types::STRING, length: 50, nullable: false)]
+    private string $parserName;
 
     #[ORM\Column(name: 'full_name', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $fullName;
+    private ?string $fullName = null;
 
     #[ORM\Column(name: 'address', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $address;
+    private ?string $address = null;
 
     #[ORM\Column(name: 'link', type: Types::STRING, length: 500, nullable: true)]
-    private ?string $link;
+    private ?string $link = null;
 
     #[ORM\Column(name: 'age', type: Types::STRING, length: 30, nullable: true)]
-    private ?string $age;
+    private ?string $age = null;
 
     public function getSearchRequest(): SearchRequest
     {
@@ -43,12 +43,12 @@ class SearchResult extends AbstractEntity
         return $this;
     }
 
-    public function getParserName(): ?string
+    public function getParserName(): string
     {
         return $this->parserName;
     }
 
-    public function setParserName(?string $parserName): self
+    public function setParserName(string $parserName): self
     {
         $this->parserName = $parserName;
 

@@ -19,16 +19,16 @@ class SearchRequest extends AbstractEntity
     private SearchRequestStatusType $status;
 
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $firstName;
+    private ?string $firstName = null;
 
     #[ORM\Column(name: 'last_name', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $lastName;
+    private ?string $lastName = null;
 
     #[ORM\Column(name: 'city', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $city;
+    private ?string $city = null;
 
     #[ORM\Column(name: 'state', type: Types::STRING, length: 255, nullable: true)]
-    private ?string $state;
+    private ?string $state = null;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'searchRequests', orphanRemoval: true)]
     private Collection $users;
