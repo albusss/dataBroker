@@ -2,65 +2,70 @@
 
 namespace App\Service;
 
+use App\Contract\Dictionary\ParserType;
+use App\Contract\Dictionary\SearchRequestStatusType;
 use App\Entity\SearchRequest;
 use App\Entity\User;
-use App\Enum\SearchRequestStatus;
 use App\Exception\AlreadyExistsException;
+use App\Message\SearchRequestMessage;
 use App\Repository\SearchRequestRepository;
-use DateTime;
-use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeImmutable;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SearchRequestCreator
 {
     public function __construct(
-        private SearchRequestRepository $searchRequestRepository,
+        private readonly SearchRequestRepository $searchRequestRepository,
+        private readonly MessageBusInterface $messageBus,
     ) {
     }
 
     /**
-     * @param UserInterface|User $user
-     * @param string $fname
-     * @param string $lname
-     * @param string $city
-     * @param string|null $state
-     * @return SearchRequest
      * @throws AlreadyExistsException
      */
     public function create(
         UserInterface $user,
-        string $fname,
-        string $lname,
+        string $firstName,
+        string $lastName,
         string $city,
-        ?string $state,
-    ): SearchRequest {
-        /** @var SearchRequest|null $res */
-        $searchPeriod = new DateTime('-2 day'); // from 2 days until now
-        $res = $this->searchRequestRepository->get($fname, $lname, $city, $state, $searchPeriod);
+        string $state,
+    ): void {
+        $searchPeriod = new DateTimeImmutable('-2 day'); // from 2 days until now
 
-        if ($res) {
-            if ($user->getSearchRequests()->contains($res)) {
+        $request = $this->searchRequestRepository
+            ->findRequest($firstName, $lastName, $city, $state, $searchPeriod);
+
+        if ($request) {
+            /** @var User $user */
+            if ($user->getSearchRequests()->contains($request)) {
                 throw new AlreadyExistsException('Search request already exists');
             }
 
-            $user->addSearchRequests($res);
-            $res->addUsers($user);
-            $this->searchRequestRepository->save($res);
+            $user->addSearchRequest($request);
+            $request->addUser($user);
 
-            return $res;
+            $this->searchRequestRepository->save($request);
+
+            return;
         }
 
-        $request = new SearchRequest();
-        $request->setFirstname($fname);
-        $request->setLastname($lname);
-        $request->setCity($city);
-        $request->setState($state);
-        $request->setStatus(SearchRequestStatus::NEW);
-        $request->setUsers(new ArrayCollection([$user]));
-        $request->setCreatedAt(new DateTime());
-        $user->addSearchRequests($request);
+        $request = (new SearchRequest())
+            ->setFirstName($firstName)
+            ->setLastName($lastName)
+            ->setCity($city)
+            ->setState($state)
+            ->setStatus(SearchRequestStatusType::New)
+            ->setCreatedAt(new DateTimeImmutable())
+            ->addUser($user);
+
+        /** @var User $user */
+        $user->addSearchRequest($request);
+
         $this->searchRequestRepository->save($request);
 
-        return $request;
+        foreach (ParserType::cases() as $case) {
+            $this->messageBus->dispatch(new SearchRequestMessage($case, $request->getId()));
+        }
     }
 }

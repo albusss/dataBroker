@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Contract\Entity\EntityInterface;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,12 +16,12 @@ use function array_unique;
 #[ORM\Table(name: 'users')]
 #[ORM\UniqueConstraint(name: 'uniq_username', columns: ['username'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements EntityInterface, UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(name: 'username', type: Types::STRING, length: 255, unique: true, nullable: false)]
     private string $username;
@@ -31,7 +32,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: 'roles', type: Types::JSON, nullable: false)]
     private array $roles = [];
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: SearchRequest::class, orphanRemoval: true)]
+    #[ORM\ManyToMany(targetEntity: SearchRequest::class, inversedBy: 'users', orphanRemoval: true)]
+    #[ORM\JoinTable(name: 'user_search_requests')]
     private Collection $searchRequests;
 
     public function __construct()
@@ -39,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->searchRequests = new ArrayCollection();
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -127,5 +129,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getSearchRequests(): Collection
     {
         return $this->searchRequests;
+    }
+
+    public function addSearchRequest(SearchRequest $searchRequest): self
+    {
+        if (!$this->searchRequests->contains($searchRequest)) {
+            $this->searchRequests->add($searchRequest);
+        }
+
+        return $this;
     }
 }

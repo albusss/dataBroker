@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\SearchRequest;
-use DateTime;
+use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -28,20 +28,25 @@ class SearchRequestRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush();
     }
 
-    public function get(string $fname, string $lname, string $city, ?string $state, DateTime $period)
-    {
+    public function findRequest(
+        string $firstName,
+        string $lastName,
+        string $city,
+        string $state,
+        DateTimeInterface $period
+    ): ?SearchRequest {
         $qb = $this->createQueryBuilder('sr');
 
         $qb
-            ->where($qb->expr()->eq('sr.firstname', ':fname'))->setParameter('fname', $fname)
-            ->andWhere($qb->expr()->eq('sr.lastname', ':lname'))->setParameter('lname', $lname)
+            ->where($qb->expr()->eq('sr.first_name', ':firstName'))->setParameter('firstName', $firstName)
+            ->andWhere($qb->expr()->eq('sr.last_name', ':lastName'))->setParameter('lastName', $lastName)
             ->andWhere($qb->expr()->eq('sr.city', ':city'))->setParameter('city', $city)
             ->andWhere($qb->expr()->eq('sr.state', ':state'))->setParameter('state', $state)
             ->andWhere($qb->expr()->gte('sr.createdAt', ':created'))->setParameter('created', $period);
 
         try {
             return $qb->getQuery()->getSingleResult();
-        } catch (NoResultException|NonUniqueResultException $e) {
+        } catch (NoResultException|NonUniqueResultException) {
             return null;
         }
     }

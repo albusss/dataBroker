@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Contract\Dictionary;
 
-enum SearchStatusType: string
+enum SearchRequestStatusType: string
 {
     case New        = 'new';
     case InProgress = 'in_progress';

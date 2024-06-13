@@ -96,13 +96,12 @@ class MainController extends AbstractController
 
             $searchId = $searchRequest->getId();
 
-            $date = $searchRequest->getCreatedAt()->format('m-d-Y');
             $temp[$searchId] = [
                 'id'     => $searchId,
-                'fname'  => $searchRequest->getFirstname(),
-                'lname'  => $searchRequest->getLastname(),
+                'fname'  => $searchRequest->getFirstName(),
+                'lname'  => $searchRequest->getLastName(),
                 'city'   => $searchRequest->getCity(),
-                'date'   => $date,
+                'date'   => $searchRequest->getCreatedAt()->format('m-d-Y'),
                 'status' => $searchRequest->getStatus(),
             ];
         }
@@ -119,7 +118,7 @@ class MainController extends AbstractController
         /** @var SearchResult $result */
         foreach ($results as $result) {
             $temp[$result->getParserName()][] = [
-                'name'    => $result->getFullname(),
+                'name'    => $result->getFullName(),
                 'address' => $result->getAddress(),
                 'age'     => $result->getAge(),
                 'link'    => $result->getLink(),

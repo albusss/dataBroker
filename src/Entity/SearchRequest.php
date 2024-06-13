@@ -2,25 +2,21 @@
 
 namespace App\Entity;
 
-use App\Contract\Dictionary\SearchStatusType;
+use App\Contract\Dictionary\SearchRequestStatusType;
 use App\Repository\SearchRequestRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Table(name: 'search_requests')]
-#[ORM\Index(columns: ['user_id'], name: 'idx_user')]
 #[ORM\Index(columns: ['status'], name: 'idx_status')]
 #[ORM\Entity(repositoryClass: SearchRequestRepository::class)]
 class SearchRequest extends AbstractEntity
 {
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'searchRequests')]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
-    private User $user;
-
-    #[ORM\Column(name: 'status', type: Types::STRING, length: 25, nullable: false, enumType: SearchStatusType::class)]
-    private SearchStatusType $status;
+    #[ORM\Column(name: 'status', type: Types::STRING, length: 25, nullable: false, enumType: SearchRequestStatusType::class)]
+    private SearchRequestStatusType $status;
 
     #[ORM\Column(name: 'first_name', type: Types::STRING, length: 255, nullable: true)]
     private ?string $firstName;
@@ -34,32 +30,24 @@ class SearchRequest extends AbstractEntity
     #[ORM\Column(name: 'state', type: Types::STRING, length: 255, nullable: true)]
     private ?string $state;
 
+    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'searchRequests', orphanRemoval: true)]
+    private Collection $users;
+
     #[ORM\OneToMany(mappedBy: 'searchRequest', targetEntity: SearchResult::class, orphanRemoval: true)]
     private Collection $searchResults;
 
     public function __construct()
     {
+        $this->users         = new ArrayCollection();
         $this->searchResults = new ArrayCollection();
     }
 
-    public function getUser(): User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): self
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    public function getStatus(): SearchStatusType
+    public function getStatus(): SearchRequestStatusType
     {
         return $this->status;
     }
 
-    public function setStatus(SearchStatusType $status): self
+    public function setStatus(SearchRequestStatusType $status): self
     {
         $this->status = $status;
 
@@ -110,6 +98,20 @@ class SearchRequest extends AbstractEntity
     public function setState(?string $state): self
     {
         $this->state = $state;
+
+        return $this;
+    }
+
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(UserInterface $user): self
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+        }
 
         return $this;
     }

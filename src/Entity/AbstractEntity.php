@@ -14,12 +14,12 @@ abstract class AbstractEntity implements EntityInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: Types::INTEGER)]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: false)]
     private DateTimeImmutable $createdAt;
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
