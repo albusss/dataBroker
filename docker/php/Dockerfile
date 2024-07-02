@@ -12,6 +12,12 @@ RUN apt-get install -y apt-utils libx11-6 libx11-xcb1 libxcb1 libxcomposite1 lib
 
 RUN apt-get install -y apt-utils libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libnss3 lsb-release xdg-utils
 
+# install google-chrome
+RUN apt-get install -y udev libu2f-udev
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome-stable_current_amd64.deb
+RUN apt-get install -f
+
 RUN pecl install xdebug \
     && docker-php-ext-install zip pdo pdo_mysql pcntl opcache \
     && docker-php-ext-enable xdebug
