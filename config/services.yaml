@@ -4,6 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    chrome_dir: '%kernel.project_dir%/var/google-chrome'
 
 services:
     # default configuration for services in *this* file
@@ -25,3 +26,8 @@ services:
     App\Service\ParserProxyProvider:
         arguments:
             $proxiesDSN: '%env(json:PROXIES_DSN)%'
+
+    App\Service\ParserCreator:
+        arguments:
+            $chromeProfileDir: '%chrome_dir%/profile'
+            $chromeUserDataDir: '%chrome_dir%/user-data'

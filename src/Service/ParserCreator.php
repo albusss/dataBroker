@@ -13,6 +13,8 @@ use function class_exists;
 class ParserCreator
 {
     public function __construct(
+        private readonly string $chromeProfileDir,
+        private readonly string $chromeUserDataDir,
         private readonly ParserProxyProvider $parserProxyProvider,
     ) {
     }
@@ -28,6 +30,10 @@ class ParserCreator
             throw new NotFoundException('Parser class "' . $parser->name . '" not found');
         }
 
-        return new $parserClass($this->parserProxyProvider->provide());
+        return new $parserClass(
+            $this->parserProxyProvider->provide(),
+            $this->chromeProfileDir,
+            $this->chromeUserDataDir,
+        );
     }
 }

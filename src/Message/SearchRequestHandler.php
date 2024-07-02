@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Message;
 
+use App\DTO\ParserRequestDTO;
 use App\Entity\SearchResult;
 use App\Exception\NotFoundException;
 use App\Repository\SearchRequestRepository;
@@ -40,7 +41,12 @@ class SearchRequestHandler
             return;
         }
 
-        $response = $parser->parse();
+        $response = $parser->parse(new ParserRequestDTO(
+            $searchRequest->getFirstName(),
+            $searchRequest->getLastName(),
+            $searchRequest->getCity(),
+            $searchRequest->getState(),
+        ));
 
         $searchResult = (new SearchResult())
             ->setSearchRequest($searchRequest)

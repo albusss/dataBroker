@@ -24,9 +24,9 @@ class ParserProxyProvider
         $proxies = [];
 
         foreach ($proxiesDSN as $dsn) {
-            [$host, $port, $user, $password] = explode(':', $dsn) + [null, null, null, null];
+            [$user, $password, $host, $port] = explode(':', $dsn) + [null, null, null, null];
 
-            if (empty($host) || empty($port) || empty($user) || empty($password)) {
+            if (empty($user) || empty($password) || empty($host) || empty($port)) {
                 throw new RuntimeException('Invalid proxy DSN "' . $dsn . '"');
             }
 
