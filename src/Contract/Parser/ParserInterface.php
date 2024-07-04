@@ -11,5 +11,8 @@ interface ParserInterface
 {
     public function getName(): string;
 
-    public function parse(ParserRequestDTO $request): ?ParserResponseDTO;
+    /**
+     * @return ParserResponseDTO[]
+     */
+    public function parse(ParserRequestDTO $request): array;
 }

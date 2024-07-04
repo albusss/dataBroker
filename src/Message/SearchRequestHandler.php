@@ -5,22 +5,23 @@ declare(strict_types=1);
 namespace App\Message;
 
 use App\DTO\ParserRequestDTO;
-use App\Entity\SearchResult;
 use App\Exception\NotFoundException;
 use App\Repository\SearchRequestRepository;
-use App\Repository\SearchResultRepository;
 use App\Service\ParserCreator;
-use DateTimeImmutable;
+use App\Service\SearchResultCreator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Throwable;
+
+use function sprintf;
 
 #[AsMessageHandler]
 class SearchRequestHandler
 {
     public function __construct(
-        private readonly ParserCreator $parserCreator,
         private readonly SearchRequestRepository $searchRequestRepository,
-        private readonly SearchResultRepository $searchResultRepository,
+        private readonly ParserCreator $parserCreator,
+        private readonly SearchResultCreator $searchResultCreator,
         private readonly LoggerInterface $parserLogger,
     ) {
     }
@@ -41,28 +42,38 @@ class SearchRequestHandler
             return;
         }
 
-        $response = $parser->parse(new ParserRequestDTO(
-            $searchRequest->getFirstName(),
-            $searchRequest->getLastName(),
-            $searchRequest->getCity(),
-            $searchRequest->getState(),
-        ));
+        $parserName = $parser->getName();
 
-        $searchResult = (new SearchResult())
-            ->setSearchRequest($searchRequest)
-            ->setParserName($parser->getName())
-            ->setCreatedAt(new DateTimeImmutable());
-
-        if (!$response) {
-            $searchResult->setFullName('No data or error. Please check manually.');
-        } else {
-            $searchResult
-                ->setFullName($response->fullName)
-                ->setAddress($response->address)
-                ->setLink($response->link)
-                ->setAge($response->age);
+        try {
+            $response = $parser->parse(new ParserRequestDTO(
+                $searchRequest->getFirstName(),
+                $searchRequest->getLastName(),
+                $searchRequest->getCity(),
+                $searchRequest->getState(),
+            ));
+        } catch (Throwable $e) {
+            $this->parserLogger->error(sprintf('[%s]: %s', $parserName, $e->getMessage()));
         }
 
-        $this->searchResultRepository->save($searchResult);
+        if (empty($response)) {
+            $this->searchResultCreator->create(
+                $searchRequest,
+                $parserName,
+                'No data or error. Please check manually.',
+            );
+
+            return;
+        }
+
+        foreach ($response as $result) {
+            $this->searchResultCreator->create(
+                $searchRequest,
+                $parserName,
+                $result->fullName,
+                $result->address,
+                $result->link,
+                $result->age,
+            );
+        }
     }
 }

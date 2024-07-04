@@ -51,6 +51,7 @@ abstract class AbstractParser implements ParserInterface
                     '--profile-directory=' . $this->chromeProfileDir,
                     '--profile-directory=Default',
                     '--user-data-dir=' . $this->chromeUserDataDir,
+                    '--window-size=1200,1100',
                 ],
                 options: [
                     'capabilities' => [
