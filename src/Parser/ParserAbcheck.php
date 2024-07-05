@@ -47,7 +47,7 @@ class ParserAbcheck extends AbstractParser
                     }
 
                     $fullName = $node->filter('.card-title')->innerText();
-                    $address  = implode(', ', $node->filter('.address-link-list > a')->extract(['_text']));
+                    $address  = implode(' | ', $node->filter('.address-link-list > a')->extract(['_text']));
                     $link     = $node->filter('.link-to-details')->getUri();
                     $age      = Util::onlyDigits($node->filter('.card-title > span')->text());
 
