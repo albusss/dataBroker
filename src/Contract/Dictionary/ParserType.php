@@ -10,4 +10,6 @@ enum ParserType
     case ParserAbcheck;
     case ParserAddresses;
     case ParserAdvancedPeopleSearch;
+//    case ParserAmericaphonebook;
+    case ParserAnywho;
 }
