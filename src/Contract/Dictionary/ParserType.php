@@ -6,6 +6,7 @@ namespace App\Contract\Dictionary;
 
 enum ParserType
 {
-    case Parser411;
+//    case Parser411;
     case ParserAbcheck;
+    case ParserAddresses;
 }

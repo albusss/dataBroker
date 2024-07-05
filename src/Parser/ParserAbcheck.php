@@ -12,24 +12,21 @@ use Throwable;
 
 use function array_filter;
 use function implode;
+use function strtolower;
 
 class ParserAbcheck extends AbstractParser
 {
     private const WEBPAGE_URL = 'https://www.advancedbackgroundchecks.com';
 
     /**
-     * @param ParserRequestDTO $request
-     * @return array|ParserResponseDTO[]
      * @throws Throwable
-     * @throws \Facebook\WebDriver\Exception\NoSuchElementException
-     * @throws \Facebook\WebDriver\Exception\TimeoutException
      */
     public function parse(ParserRequestDTO $request): array
     {
-        $searchUrl = '/names/' . implode('_', array_filter([
+        $searchUrl = '/names/' . strtolower(implode('_', array_filter([
             implode('-', array_filter([$request->firstName, $request->lastName])),
             implode('-', array_filter([$request->city, $request->state])),
-        ]));
+        ])));
 
         $response = [];
 
