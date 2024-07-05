@@ -12,4 +12,5 @@ enum ParserType
     case ParserAnywho;
     case ParserBackgroundcheck;
     case ParserClustrmaps;
+    case ParserCyberbackgroundchecks;
 }
