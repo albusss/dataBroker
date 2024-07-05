@@ -28,10 +28,10 @@ class SearchResultCreator
             (new SearchResult())
                 ->setSearchRequest($searchRequest)
                 ->setParserName($parserName)
-                ->setFullName($fullName)
-                ->setAddress($address)
-                ->setLink($link)
-                ->setAge($age)
+                ->setFullName($fullName ?: null)
+                ->setAddress($address ?: null)
+                ->setLink($link ?: null)
+                ->setAge($age ?: null)
                 ->setCreatedAt(new DateTimeImmutable())
         );
     }

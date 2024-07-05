@@ -6,27 +6,28 @@ namespace App\Parser;
 
 use App\DTO\ParserRequestDTO;
 use App\DTO\ParserResponseDTO;
+use App\Service\Util;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
 
 use function array_filter;
 use function implode;
-use function strtolower;
 
-class ParserAddresses extends AbstractParser
+class ParserAdvancedPeopleSearch extends AbstractParser
 {
-    private const WEBPAGE_URL = 'https://www.addresses.com';
+    private const WEBPAGE_URL = 'https://www.advanced-people-search.com';
 
     /**
      * @throws Throwable
      */
     public function parse(ParserRequestDTO $request): array
     {
-        // /people/firstname+lastname/
-        $searchUrl = '/people/' . strtolower(
+        // /people/FirstName+LastName/City/State(2 char)/
+        $searchUrl = '/people/' . implode('/', array_filter([
             implode('+', array_filter([$request->firstName, $request->lastName])),
-        ) . '/';
+            implode('/', array_filter([$request->city, $request->state])),
+        ])) . '/';
 
         $response = [];
 
@@ -38,13 +39,13 @@ class ParserAddresses extends AbstractParser
             $client->request('GET', self::WEBPAGE_URL . $searchUrl);
 
             try {
-                $crawler = $client->waitFor('.people-container');
-                $crawler->filter('.person-info')->each(static function (Crawler $node) use (&$response): void {
-                    $fullName = $node->filter('.person-name')->text();
-                    $address  = $node->filter('.p:last-child')->text();
-                    $link     = $node->filter('.view-profile')->getUri();
+                $crawler = $client->waitFor('.results-list');
+                $crawler->filter('.result-content')->each(static function (Crawler $node) use (&$response): void {
+                    $fullName = $node->filter('.result-name span')->text();
+                    $address  = $node->filter('.result-current-address')->text();
+                    $age      = Util::onlyDigits($node->filter('.result-name')->innerText()) ?: null;
 
-                    $response[] = new ParserResponseDTO($fullName, $address, $link, null);
+                    $response[] = new ParserResponseDTO($fullName, $address, null, $age);
                 });
             } catch (TimeoutException) {
                 $client->quit();

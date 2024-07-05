@@ -6,6 +6,7 @@ namespace App\Parser;
 
 use App\DTO\ParserRequestDTO;
 use App\DTO\ParserResponseDTO;
+use App\Service\Util;
 use Facebook\WebDriver\Exception\TimeoutException;
 use Symfony\Component\DomCrawler\Crawler;
 use Throwable;
@@ -23,6 +24,7 @@ class ParserAbcheck extends AbstractParser
      */
     public function parse(ParserRequestDTO $request): array
     {
+        // /names/firstname-lastname_city-state(2 char)
         $searchUrl = '/names/' . strtolower(implode('_', array_filter([
             implode('-', array_filter([$request->firstName, $request->lastName])),
             implode('-', array_filter([$request->city, $request->state])),
@@ -47,7 +49,7 @@ class ParserAbcheck extends AbstractParser
                     $fullName = $node->filter('.card-title')->innerText();
                     $address  = implode(', ', $node->filter('.address-link-list > a')->extract(['_text']));
                     $link     = $node->filter('.link-to-details')->getUri();
-                    $age      = $node->filter('.card-title > span')->text();
+                    $age      = Util::onlyDigits($node->filter('.card-title > span')->text());
 
                     $response[] = new ParserResponseDTO($fullName, $address, $link, $age);
                 });

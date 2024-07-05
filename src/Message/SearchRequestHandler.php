@@ -52,7 +52,9 @@ class SearchRequestHandler
                 $searchRequest->getState(),
             ));
         } catch (Throwable $e) {
-            $this->parserLogger->error(sprintf('[%s]: %s', $parserName, $e->getMessage()));
+            $this->parserLogger->error(
+                sprintf('#%d [%s]: %s', $searchRequest->getId(), $parserName, $e->getMessage()),
+            );
         }
 
         if (empty($response)) {
