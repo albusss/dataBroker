@@ -223,11 +223,11 @@ class Parsers
             'path' => 'src/Parser/radaris.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'searchquarry.com',
-            'path' => 'src/Parser/searchquarry.js',
-            'path_to_deleter' => '',
-        ],
+//        [// not working, waiting for selector failed
+//            'name' => 'searchquarry.com',
+//            'path' => 'src/Parser/searchquarry.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'spokeo.com',
             'path' => 'src/Parser/spokeo.js',
