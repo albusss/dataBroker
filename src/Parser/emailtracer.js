@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = 'https://emailtracer.com/';
 
 (async () => {
     try {
@@ -73,8 +68,8 @@ const webpageURL = 'https://emailtracer.com/';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
-        await page.waitForSelector('#firstName')
+        await page.goto('https://emailtracer.com/');
+        await page.waitForSelector('#firstName');
         await page.type('#firstName', firstname);
         await page.type('#lastName', lastname);
         await page.type('#city', city);
@@ -87,10 +82,10 @@ const webpageURL = 'https://emailtracer.com/';
             let profileList = Array.from(document.querySelectorAll('.list-result')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('.name')?.textContent?.trim();
-                let address = profile.querySelector('.address')?.textContent?.trim();
+                let name = profile.querySelector('.name').textContent.trim();
+                let address = profile.querySelector('.address').textContent.trim();
                 res.push({name, address})
-            })
+            });
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));
