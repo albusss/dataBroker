@@ -114,8 +114,8 @@ class Parsers
             'path_to_deleter' => '',
         ],
         [
-            'name' => 'FloridaResidentsDirectory.com',
-            'path' => 'src/Parser/florida.js',
+            'name' => 'floridaresidentsdirectory.com',
+            'path' => 'src/Parser/floridaresidentsdirectory.js',
             'path_to_deleter' => '',
         ],
         [

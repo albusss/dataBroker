@@ -1,15 +1,19 @@
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const logger = require('./other/logger');
+const fs = require("fs");
+const path = require("path");
+
+let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
+let config = JSON.parse(rawdata);
 let browser, page;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
 
 puppeteer.use(StealthPlugin());
-
-const link = 'https://www.floridaresidentsdirectory.com';
 
 (async () => {
     try {
@@ -18,25 +22,40 @@ const link = 'https://www.floridaresidentsdirectory.com';
             slowMo: 100,
             headless: true,
             devtools: true,
-            args: ['--no-sandbox'],
+            args: [
+                '--proxy-server=' + config.proxy[proxyNumber].host,
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                "--disable-gpu",
+                "--disable-dev-shm-usage"
+            ],
         });
 
         page = await browser.newPage()
 
         await page.setJavaScriptEnabled(true);
         await page.setDefaultNavigationTimeout(0);
-        await page.setDefaultTimeout(30000);
+        await page.setDefaultTimeout(60000 * 10);
         await page.setRequestInterception(true);
 
+        await page.setViewport({
+            width: 1920 + Math.floor(Math.random() * 100),
+            height: 3000 + Math.floor(Math.random() * 100),
+            deviceScaleFactor: 1,
+            hasTouch: false,
+            isLandscape: false,
+            isMobile: false,
+        });
+
         page.on('request', (req) => {
-            if(
+            if (
                 req.resourceType() === 'image'
                 || req.resourceType() === 'stylesheet'
                 || req.resourceType() === 'font'
-                || req.url().substring(0, 30) === 'amazon'
-                || req.url().substring(0, 30) === 'youtube'
-                || req.url().substring(0, 30) === 'google'
-                || req.url().substring(0, 30) === 'adservice'
+                || req.url().includes('amazon')
+                || req.url().includes('youtube')
+                || req.url().includes('google')
+                || req.url().includes('adservice')
             ) {
                 req.abort();
             } else {
@@ -44,12 +63,12 @@ const link = 'https://www.floridaresidentsdirectory.com';
             }
         });
 
-        await page.goto(link)
-        await page.waitForSelector('.main')
+        await page.authenticate({
+            username: config.proxy[proxyNumber].user,
+            password: config.proxy[proxyNumber].pass
+        });
 
-        await page.type('input[name="q[full_name]"]', firstname+' '+lastname);
-        await page.type('input[name="q[location]"]', city + ', ' + state);
-        await page.keyboard.press('Enter');
+        await page.goto(`https://www.floridaresidentsdirectory.com/name/${firstname}-${lastname}`);
 
         await page.waitForSelector('#search-results')
 
