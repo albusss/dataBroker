@@ -188,16 +188,16 @@ class Parsers
             'path' => 'src/Parser/peoplefinders.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'peoplelookup.com',
-            'path' => 'src/Parser/peoplelookup.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'peoplesearchsite.com',
-            'path' => 'src/Parser/peoplesearchsite.js',
-            'path_to_deleter' => '',
-        ],
+//        [// a mirror of https://www.ussearch.com/
+//            'name' => 'peoplelookup.com',
+//            'path' => 'src/Parser/peoplelookup.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// not working, this domain is available for sale
+//            'name' => 'peoplesearchsite.com',
+//            'path' => 'src/Parser/peoplesearchsite.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'peoplewhiz.com',
             'path' => 'src/Parser/peoplewhiz.js',
