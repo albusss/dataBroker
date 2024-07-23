@@ -123,11 +123,11 @@ class Parsers
             'path' => 'src/Parser/freepeopledirectory.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'governmentregistry.com',
-            'path' => 'src/Parser/governmentregistry.js',
-            'path_to_deleter' => '',
-        ],
+//        [// prompts you to enter an email address to send your results
+//            'name' => 'governmentregistry.com',
+//            'path' => 'src/Parser/governmentregistry.js',
+//            'path_to_deleter' => '',
+//        ],
 //        [// not working, waiting for selector failed
 //            'name' => 'persontrust.com',
 //            'path' => 'src/Parser/persontrust.js',
