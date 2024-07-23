@@ -203,21 +203,21 @@ class Parsers
             'path' => 'src/Parser/peoplewhiz.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'persopo.com',
-            'path' => 'src/Parser/persopo.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'privateeye.com',
-            'path' => 'src/Parser/privateeye.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'publicrecordsnow.com',
-            'path' => 'src/Parser/publicrecordsnow.js',
-            'path_to_deleter' => '',
-        ],
+//        [// a mirror of https://www.truthfinder.com/
+//            'name' => 'persopo.com',
+//            'path' => 'src/Parser/persopo.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// not working, this domain is available for sale
+//            'name' => 'privateeye.com',
+//            'path' => 'src/Parser/privateeye.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// not working, this domain is available for sale
+//            'name' => 'publicrecordsnow.com',
+//            'path' => 'src/Parser/publicrecordsnow.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'radaris.com',
             'path' => 'src/Parser/radaris.js',
