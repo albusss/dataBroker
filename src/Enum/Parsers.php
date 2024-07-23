@@ -233,11 +233,11 @@ class Parsers
             'path' => 'src/Parser/spokeo.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'truePeopleSearch.com',
-            'path' => 'src/Parser/truepeoplesearch.js',
-            'path_to_deleter' => '',
-        ],
+//        [// cloudflare
+//            'name' => 'truePeopleSearch.com',
+//            'path' => 'src/Parser/truepeoplesearch.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'truthfinder.com',
             'path' => 'src/Parser/truthfinder.js',

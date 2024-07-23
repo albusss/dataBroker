@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const link = 'https://spokeo.com';
 
 (async () => {
     try {
@@ -71,31 +66,25 @@ const link = 'https://spokeo.com';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(link)
-        await page.waitForTimeout(6000);
-        await page.evaluate(() => window.stop());
+        await page.goto(`https://www.spokeo.com/${firstname}-${lastname}/${state}/${city}`);
 
-        await page.type('#homepage_hero_form  input[name="q"]', firstname+' '+lastname);
-        await page.keyboard.press('Enter');
+        await page.waitForSelector('.single-column-list-item');
 
-        await page.waitForSelector('.single-column-list-item')
-
-        let result = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.single-column-list-item')).slice(0, 10);
+        const results = await page.evaluate(() => {
+            let titleNodeList = Array.from(document.querySelectorAll('.single-column-list-item'));
             let res = [];
             titleNodeList.forEach((node) => {
-                let [name, age] = node.querySelector('.title')?.textContent?.split(',');
-                let link = node.querySelector('.title')?.href;
+                let name = node.querySelector('.title').textContent.trim();
+                let link = node.querySelector('.title').href;
                 let location = Array.from(node.querySelectorAll('strong'))
-                    .find((elem) => elem.textContent?.includes('Lived In'))
-                    ?.nextElementSibling
-                    ?.textContent;
-                res.push({name, age, link, location});
+                    .find((elem) => elem.textContent.includes('Resides in'))
+                    .textContent.replace('Resides in', '').trim();
+
+                res.push({name, age: null, link, location});
             })
             return res;
-        }, link);
-
-        console.log(JSON.stringify({message: result, error: null}));
+        });
+        console.log(JSON.stringify({message: results, error: null}));
     } catch(e){
         console.log(JSON.stringify({message: null, error: e.message}));
         logger.error(JSON.stringify(e, Object.getOwnPropertyNames(e)));
