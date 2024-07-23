@@ -3,28 +3,23 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = 'https://www.familytreenow.com';
 
 (async () => {
     try {
 
         browser = await puppeteer.launch({
             slowMo: 100,
-            headless: false,
+            headless: true,
             devtools: true,
             args: [
                 '--proxy-server=' + config.proxy[proxyNumber].host,
@@ -73,8 +68,8 @@ const webpageURL = 'https://www.familytreenow.com';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
-        await page.waitForSelector('#First')
+        await page.goto('https://www.familytreenow.com');
+        await page.waitForSelector('#First');
         await page.type('#First', firstname);
         await page.type('#Last', lastname);
         await page.type('#CityStateZip', city + ', '+ state);
@@ -83,26 +78,31 @@ const webpageURL = 'https://www.familytreenow.com';
         await page.waitForSelector('#summaryResults');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.row')).slice(0, 10);
+            let profileList = Array.from(document.querySelectorAll('.row'));
             let res = [];
             profileList.forEach((profile) => {
-                let name = Array.from(profile.querySelectorAll('td'))
+                if (!profile.textContent.includes('Public Records')) {
+                    return;
+                }
+                let el;
+                let name = Array.from(profile.querySelectorAll('td.text-right'))
                     .find((elem) => elem.textContent.includes('Name'))
-                    ?.nextElementSibling
-                    ?.textContent
-                let age = Array.from(profile.querySelectorAll('td'))
+                    .nextElementSibling
+                    .textContent;
+                let age = Array.from(profile.querySelectorAll('td.text-right'))
                     .find((elem) => elem.textContent.includes('Age'))
-                    ?.nextElementSibling
-                    ?.textContent
-                let address = Array.from(profile.querySelectorAll('td'))
-                    .find((elem) => elem.textContent.includes('Lives in'))
-                    ?.nextElementSibling
-                    ?.textContent
+                    .nextElementSibling
+                    .textContent
+                    .trim();
+                let address = (el = Array.from(profile.querySelectorAll('td.text-right'))
+                    .find((elem) => elem.textContent.includes('Lives in')))
+                        ? el.nextElementSibling.textContent : 'NOT_FOUND';
                 let link = Array.from(profile.querySelectorAll('a'))
                     .find((elem) => elem.textContent.includes('View Details'))
-                    ?.href
+                    .href;
+
                 res.push({name, age, address, link});
-            })
+            });
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));
