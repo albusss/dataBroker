@@ -128,11 +128,11 @@ class Parsers
             'path' => 'src/Parser/governmentregistry.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'inforver.com',
-            'path' => 'src/Parser/inforver.js',
-            'path_to_deleter' => '',
-        ],
+//        [// not working, waiting for selector failed
+//            'name' => 'persontrust.com',
+//            'path' => 'src/Parser/persontrust.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'instantcheckmate.com',
             'path' => 'src/Parser/instantcheckmate.js',
