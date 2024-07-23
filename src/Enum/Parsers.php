@@ -253,11 +253,11 @@ class Parsers
             'path' => 'src/Parser/ussearch.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'voterRecords.com',
-            'path' => 'src/Parser/voterrecords.js',
-            'path_to_deleter' => '',
-        ],
+//        [// cloudflare
+//            'name' => 'voterRecords.com',
+//            'path' => 'src/Parser/voterrecords.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'whitePages',
             'path' => 'src/Parser/whitepages.js',
