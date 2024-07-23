@@ -93,16 +93,16 @@ class Parsers
             'path' => 'src/Parser/familytreenow.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'fastPeopleSearch.com',
-            'path' => 'src/Parser/fastpeople.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'findpeoplefast.com',
-            'path' => 'src/Parser/findpeoplefast.js',
-            'path_to_deleter' => '',
-        ],
+//        [// not working, waiting for selector failed
+//            'name' => 'fastpeoplesearch.com',
+//            'path' => 'src/Parser/fastpeoplesearch.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// cloudflare
+//            'name' => 'findpeoplefast.com',
+//            'path' => 'src/Parser/findpeoplefast.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'findpeoplesearch.com',
             'path' => 'src/Parser/findpeoplesearch.js',
