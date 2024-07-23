@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = `https://www.michiganresidentdatabase.com/name/${firstname}-${lastname}`;
 
 (async () => {
     try {
@@ -73,19 +68,20 @@ const webpageURL = `https://www.michiganresidentdatabase.com/name/${firstname}-$
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
+        await page.goto(`https://www.michiganresidentdatabase.com/name/${firstname}-${lastname}`);
+
         await page.waitForSelector('#search-results');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.element')).slice(0, 10);
+            let profileList = Array.from(document.querySelectorAll('.element'));
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('h2[itemprop=name]')?.textContent?.trim();
-                let link = profile.querySelector('a')?.href;
+                let name = profile.querySelector('h2[itemprop=name]').textContent.trim();
+                let link = profile.querySelector('a').href;
                 const age = Array.from(profile.querySelectorAll('p'))
                     .find((elem) => elem.textContent.includes('Age'))
-                    ?.textContent?.replace('Age: ', '')
-                let address = profile.querySelector('span[itemprop=address]')?.textContent?.trim();
+                    .textContent.replace('Age: ', '')
+                let address = profile.querySelector('span[itemprop=address]').textContent.trim();
                 res.push({name, address, link, age});
             })
             return res;

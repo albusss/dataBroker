@@ -153,16 +153,16 @@ class Parsers
             'path' => 'src/Parser/michiganresidentdatabase.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'mylife.com',
-            'path' => 'src/Parser/mylife.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'myrelatives.com',
-            'path' => 'src/Parser/myrelatives.js',
-            'path_to_deleter' => '',
-        ],
+//        [// not working, page https://www.mylife.com/ can't be loaded
+//            'name' => 'mylife.com',
+//            'path' => 'src/Parser/mylife.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// a mirror of https://www.peoplefinders.com
+//            'name' => 'myrelatives.com',
+//            'path' => 'src/Parser/myrelatives.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'northcarolinaresidentdatabase.com',
             'path' => 'src/Parser/northcarolinaresidentdatabase.js',
