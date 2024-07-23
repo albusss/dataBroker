@@ -138,11 +138,11 @@ class Parsers
             'path' => 'src/Parser/instantcheckmate.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'intelius.com',
-            'path' => 'src/Parser/intelius.js',
-            'path_to_deleter' => '',
-        ],
+//        [// not working, waiting for selector failed
+//            'name' => 'intelius.com',
+//            'path' => 'src/Parser/intelius.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'kwold.com',
             'path' => 'src/Parser/kwold.js',
