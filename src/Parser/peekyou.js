@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -67,16 +64,18 @@ let state = process.argv[5];
             username: config.proxy[proxyNumber].user,
             password: config.proxy[proxyNumber].pass
         });
-        await page.goto(`https://www.peekyou.com/usa/${state}/${firstname}_${lastname}`)
-        await page.waitForSelector('div#resultsContainerProfiles')
+
+        await page.goto(`https://www.peekyou.com/usa/${state}/${firstname}_${lastname}`);
+
+        await page.waitForSelector('div#resultsContainerProfiles');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div.profileRow'));
+            let titleNodeList = Array.from(document.querySelectorAll('div.resultCell'));
             let res = [];
             titleNodeList.map(td => {
                 const linkd = td.querySelector('div > h2 > a').getAttribute('href');
                 const name = td.querySelector('div > h2 > a > span').textContent;
-                const location = td.querySelector('div > p.locations') ? td.querySelector('div > p.locations > span').textContent: 'NOT_FOUND';
+                const location = td.querySelector('div > p.locations') ? td.querySelector('div > p.locations > a').textContent: 'NOT_FOUND';
                 res.push({
                     name,
                     location,
