@@ -168,11 +168,11 @@ class Parsers
             'path' => 'src/Parser/northcarolinaresidentdatabase.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'nuwber.com',
-            'path' => 'src/Parser/nuwber.js',
-            'path_to_deleter' => '',
-        ],
+//        [// cloudflare
+//            'name' => 'nuwber.com',
+//            'path' => 'src/Parser/nuwber.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'ohioresidentdatabase.com',
             'path' => 'src/Parser/ohioresidentdatabase.js',
