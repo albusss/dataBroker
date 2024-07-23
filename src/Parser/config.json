@@ -1,19 +1,14 @@
 {
-  "proxy": [
-    {
-      "host": "46.232.13.70:8000",
-      "user": "z2TY6P",
-      "pass": "77fzcY"
-    },
-    {
-      "host": "46.232.12.115:8000",
-      "user": "z2TY6P",
-      "pass": "77fzcY"
-    },
-    {
-      "host": "46.232.13.235:8000",
-      "user": "z2TY6P",
-      "pass": "77fzcY"
-    }
-  ]
+    "proxy": [
+        {
+            "host": "138.219.72.156:8000",
+            "user": "ck50EC",
+            "pass": "VuJnqb"
+        },
+        {
+            "host": "138.219.72.181:8000",
+            "user": "ck50EC",
+            "pass": "VuJnqb"
+        }
+    ]
 }
