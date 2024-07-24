@@ -78,7 +78,7 @@ class Parsers
             'path' => 'src/Parser/clustrmaps.js',
             'path_to_deleter' => '',
         ],
-        [
+        [// cloudflare, but works
             'name' => 'cyberBackgroundChecks.com',
             'path' => 'src/Parser/cyberbackgroundchecks.js',
             'path_to_deleter' => '',
