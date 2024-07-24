@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -67,7 +64,9 @@ let state = process.argv[5];
             username: config.proxy[proxyNumber].user,
             password: config.proxy[proxyNumber].pass
         });
-        await page.goto(`https://www.anywho.com/people/${firstname}+${lastname}/`);
+
+        await page.goto(`https://www.anywho.com/people/${firstname}+${lastname}/${city}+${state}/`);
+
         await page.waitForSelector('.person-info');
 
         const results = await page.evaluate(() => {
@@ -75,16 +74,16 @@ let state = process.argv[5];
             let profileList = Array.from(document.querySelectorAll('.person-info')).slice(0, 10);
             profileList.map(profile => {
                 let name, age, location, link;
-                name = (profile.querySelector('.name-link')?.textContent.trim());
-                const isAge = (profile.textContent?.indexOf('Age'));
+                name = profile.querySelector('.person-info > strong:first-child').textContent.trim();
+                const isAge = (profile.textContent.indexOf('Age'));
                 if (isAge !== -1) {
-                    age = profile.textContent?.substring(isAge, isAge + 6)?.replace('Age ', '');
+                    age = profile.textContent.substring(isAge, isAge + 6).replace('Age ', '');
                 }
-                location = (profile.querySelector('p')?.textContent.trim())
-                link = profile.querySelector('.view-profile')?.href;
+                location = (profile.querySelector('p').textContent.trim())
+                link = profile.querySelector('.view-profile').href;
 
                 res.push({name, age, location, link});
-            })
+            });
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));
