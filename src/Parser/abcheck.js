@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -73,23 +70,20 @@ const webpageURL = 'https://www.advancedbackgroundchecks.com';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
-        await page.waitForSelector('#form-search-name')
-        await page.type('#search-name-name', firstname+' '+lastname);
-        await page.keyboard.press('Enter');
+        await page.goto(`https://www.advancedbackgroundchecks.com/names/${firstname}-${lastname}_${city}-${state}`);
 
         await page.waitForSelector('#peoplelist2');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('#peoplelist2 > div.card'));
+            let titleNodeList = Array.from(document.querySelectorAll('.card .card-block'));
             let res = [];
             titleNodeList.map((td, index) => {
                 if (index >= 3) { // skip sponsored
-                    const nameContent = (td.querySelector('div > h4').textContent.trim())
+                    const nameContent = (td.querySelector('.card-title').textContent.trim())
                     const name = nameContent.slice(0, nameContent.indexOf('Age'));
-                    const age = td.querySelector('div > h4 > span').textContent.trim();
-                    const location = td.querySelector('div > p:nth-child(2)').textContent.trim();
-                    const linkContent = (td.querySelector('div > a.link-to-details')).getAttribute('href');
+                    const age = td.querySelector('.card-title > span').textContent.trim();
+                    const location = td.querySelector('.card-text').textContent.trim();
+                    const linkContent = (td.querySelector('a.link-to-details')).getAttribute('href');
                     const link = linkContent[0] === '/' ? 'https://www.advancedbackgroundchecks.com' + linkContent : linkContent;
                     res.push({name, age, location, link});
                 }
