@@ -33,16 +33,16 @@ class Parsers
             'path' => 'src/Parser/abcheck.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'addresses.com',
-            'path' => 'src/Parser/addresses.js',
-            'path_to_deleter' => '',
-        ],
-        [
-            'name' => 'advanced-people-search.com',
-            'path' => 'src/Parser/advanced-people-search.js',
-            'path_to_deleter' => '',
-        ],
+//        [// cloudflare
+//            'name' => 'addresses.com',
+//            'path' => 'src/Parser/addresses.js',
+//            'path_to_deleter' => '',
+//        ],
+//        [// not working, this domain is available for sale
+//            'name' => 'advanced-people-search.com',
+//            'path' => 'src/Parser/advanced-people-search.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'americaphonebook.com',
             'path' => 'src/Parser/americaphonebook.js',
