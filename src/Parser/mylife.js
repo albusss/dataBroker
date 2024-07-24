@@ -3,14 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
