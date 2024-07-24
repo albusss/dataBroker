@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -67,7 +64,9 @@ let state = process.argv[5];
             username: config.proxy[proxyNumber].user,
             password: config.proxy[proxyNumber].pass
         });
+
         await page.goto(`https://www.backgroundalert.com/path/background/ln/1/results?searchbox=simple&SID=n016dgYcbUwBbcyrWCHIuBCS8M0-PoUd&fn=${firstname}&ln=${lastname}&state=${state}`);
+
         await page.waitForSelector('.person');
 
         const results = await page.evaluate(() => {
@@ -75,12 +74,12 @@ let state = process.argv[5];
             let profileList = Array.from(document.querySelectorAll('.person')).slice(0, 10);
             profileList.map(profile => {
                 let name, age, location, link;
-                name = profile.querySelector('.nameMain')?.textContent.trim();
-                age = profile.querySelector('.age')?.textContent;
-                location = profile.querySelector('.address > div:nth-child(2)')?.textContent;
-                link = profile.querySelector('a')?.href
+                name = profile.querySelector('.main-name').textContent.trim();
+                age = profile.querySelector('.age').textContent;
+                location = profile.querySelector('.address > div:nth-child(2)').textContent;
+                link = profile.querySelector('a').href
                 res.push({name, age, location, link});
-            })
+            });
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));
