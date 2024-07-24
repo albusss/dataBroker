@@ -23,7 +23,7 @@ class Parsers
     ];
 
     public const PARSERS = [
-        [
+        [// cloudflare, but works
             'name' => '411.com',
             'path' => 'src/Parser/411.js',
             'path_to_deleter' => '',
