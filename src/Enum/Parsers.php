@@ -38,11 +38,6 @@ class Parsers
 //            'path' => 'src/Parser/addresses.js',
 //            'path_to_deleter' => '',
 //        ],
-//        [// not working, this domain is available for sale
-//            'name' => 'advanced-people-search.com',
-//            'path' => 'src/Parser/advanced-people-search.js',
-//            'path_to_deleter' => '',
-//        ],
         [
             'name' => 'americaphonebook.com',
             'path' => 'src/Parser/americaphonebook.js',
@@ -68,11 +63,6 @@ class Parsers
             'path' => 'src/Parser/beenverified.js',
             'path_to_deleter' => '',
         ],
-//        [// a mirror of https://www.spokeo.com
-//            'name' => 'callersmart.com',
-//            'path' => 'src/Parser/callersmart.js',
-//            'path_to_deleter' => '',
-//        ],
         [
             'name' => 'clustrmaps.com',
             'path' => 'src/Parser/clustrmaps.js',
@@ -158,11 +148,6 @@ class Parsers
 //            'path' => 'src/Parser/mylife.js',
 //            'path_to_deleter' => '',
 //        ],
-//        [// a mirror of https://www.peoplefinders.com
-//            'name' => 'myrelatives.com',
-//            'path' => 'src/Parser/myrelatives.js',
-//            'path_to_deleter' => '',
-//        ],
         [
             'name' => 'northcarolinaresidentdatabase.com',
             'path' => 'src/Parser/northcarolinaresidentdatabase.js',
@@ -188,36 +173,11 @@ class Parsers
             'path' => 'src/Parser/peoplefinders.js',
             'path_to_deleter' => '',
         ],
-//        [// a mirror of https://www.ussearch.com/
-//            'name' => 'peoplelookup.com',
-//            'path' => 'src/Parser/peoplelookup.js',
-//            'path_to_deleter' => '',
-//        ],
-//        [// not working, this domain is available for sale
-//            'name' => 'peoplesearchsite.com',
-//            'path' => 'src/Parser/peoplesearchsite.js',
-//            'path_to_deleter' => '',
-//        ],
         [
             'name' => 'peoplewhiz.com',
             'path' => 'src/Parser/peoplewhiz.js',
             'path_to_deleter' => '',
         ],
-//        [// a mirror of https://www.truthfinder.com/
-//            'name' => 'persopo.com',
-//            'path' => 'src/Parser/persopo.js',
-//            'path_to_deleter' => '',
-//        ],
-//        [// not working, this domain is available for sale
-//            'name' => 'privateeye.com',
-//            'path' => 'src/Parser/privateeye.js',
-//            'path_to_deleter' => '',
-//        ],
-//        [// not working, this domain is available for sale
-//            'name' => 'publicrecordsnow.com',
-//            'path' => 'src/Parser/publicrecordsnow.js',
-//            'path_to_deleter' => '',
-//        ],
         [
             'name' => 'radaris.com',
             'path' => 'src/Parser/radaris.js',
