@@ -68,11 +68,11 @@ class Parsers
             'path' => 'src/Parser/beenverified.js',
             'path_to_deleter' => '',
         ],
-        [
-            'name' => 'callersmart.com',
-            'path' => 'src/Parser/callersmart.js',
-            'path_to_deleter' => '',
-        ],
+//        [// a mirror of https://www.spokeo.com
+//            'name' => 'callersmart.com',
+//            'path' => 'src/Parser/callersmart.js',
+//            'path_to_deleter' => '',
+//        ],
         [
             'name' => 'clustrmaps.com',
             'path' => 'src/Parser/clustrmaps.js',
