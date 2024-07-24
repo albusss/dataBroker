@@ -73,7 +73,7 @@ let state = process.argv[5];
         await page.waitForSelector('.tm-people-search');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.tm-search-item'));
+            let profileList = Array.from(document.querySelectorAll('.tm-search-item')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
                 let link = profile.href;

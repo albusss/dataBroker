@@ -77,7 +77,7 @@ let state = process.argv[5];
         await page.waitForSelector('.panel');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.panel'));
+            let profileList = Array.from(document.querySelectorAll('.panel')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
                 let name = profile.querySelector('.head_name').textContent.split('-')[0].trim();

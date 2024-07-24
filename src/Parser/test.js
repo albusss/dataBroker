@@ -8,7 +8,7 @@ const logger = require('./other/logger');
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-Math.floor(Math.random() * config.proxy.length);
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let link = process.argv[2];
 
 (async () => {

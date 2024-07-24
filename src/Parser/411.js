@@ -71,7 +71,7 @@ let state = process.argv[5];
 
         const results = await page.evaluate(() => {
             let res = [];
-            let allProfileList = Array.from(document.querySelectorAll('.serp-card'));
+            let allProfileList = Array.from(document.querySelectorAll('.serp-card')).slice(0, 10);
             if(!allProfileList.length) {
                 return res;
             }

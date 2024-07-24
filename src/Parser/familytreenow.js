@@ -78,7 +78,7 @@ let state = process.argv[5];
         await page.waitForSelector('#summaryResults');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.row'));
+            let profileList = Array.from(document.querySelectorAll('.row')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
                 if (!profile.textContent.includes('Public Records')) {

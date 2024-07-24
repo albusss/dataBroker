@@ -77,7 +77,7 @@ let state = process.argv[5];
         await page.waitForSelector('div[itemprop=Person]');
 
         let results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div[itemprop=Person]'));
+            let titleNodeList = Array.from(document.querySelectorAll('div[itemprop=Person]')).slice(0, 10);
 
             let res = [];
             titleNodeList.map(node => {

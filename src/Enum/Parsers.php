@@ -88,11 +88,11 @@ class Parsers
 //            'path' => 'src/Parser/fastpeoplesearch.js',
 //            'path_to_deleter' => '',
 //        ],
-//        [// cloudflare
-//            'name' => 'findpeoplefast.com',
-//            'path' => 'src/Parser/findpeoplefast.js',
-//            'path_to_deleter' => '',
-//        ],
+        [// cloudflare, but works
+            'name' => 'findpeoplefast.com',
+            'path' => 'src/Parser/findpeoplefast.js',
+            'path_to_deleter' => '',
+        ],
         [
             'name' => 'findpeoplesearch.com',
             'path' => 'src/Parser/findpeoplesearch.js',

@@ -70,7 +70,7 @@ let state = process.argv[5];
         await page.waitForSelector('div#resultsContainerProfiles');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div.resultCell'));
+            let titleNodeList = Array.from(document.querySelectorAll('div.resultCell')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 const linkd = td.querySelector('div > h2 > a').getAttribute('href');

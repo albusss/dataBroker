@@ -76,7 +76,7 @@ let state = process.argv[5];
         await page.waitForSelector('#people');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.person.highly-likely'));
+            let titleNodeList = Array.from(document.querySelectorAll('.person.highly-likely')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 const nameNode = td.querySelector('.link-name');

@@ -72,7 +72,7 @@ let state = process.argv[5];
 
         const results = await page.evaluate(() => {
             let res = [];
-            let allProfileList = Array.from(document.querySelectorAll('a.record'));
+            let allProfileList = Array.from(document.querySelectorAll('a.record')).slice(0, 10);
             if(!allProfileList.length) {
                 return res;
             }

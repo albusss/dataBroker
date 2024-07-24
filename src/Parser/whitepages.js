@@ -69,7 +69,7 @@ let state = process.argv[5];
         await page.waitForSelector('.results-container');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.serp-card'));
+            let titleNodeList = Array.from(document.querySelectorAll('.serp-card')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 var linkd = td.getAttribute('href');

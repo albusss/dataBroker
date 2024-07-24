@@ -71,7 +71,7 @@ let state = process.argv[5];
         await page.waitForSelector('.single-column-list-item');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.single-column-list-item'));
+            let titleNodeList = Array.from(document.querySelectorAll('.single-column-list-item')).slice(0, 10);
             let res = [];
             titleNodeList.forEach((node) => {
                 let name = node.querySelector('.title').textContent.trim();

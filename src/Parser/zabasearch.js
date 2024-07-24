@@ -75,7 +75,7 @@ let state = process.argv[5];
         await page.waitForSelector('div#container-result');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('#container-result > .person > section:first-child'));
+            let titleNodeList = Array.from(document.querySelectorAll('#container-result > .person > section:first-child')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 const nameNode = td.querySelector('#container-name a');

@@ -8,13 +8,11 @@ const logger = require('./other/logger');
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-Math.floor(Math.random() * config.proxy.length);
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = `https://findpeoplefast.net/people/${firstname}-${lastname}`;
 
 (async () => {
     try {
@@ -70,7 +68,7 @@ const webpageURL = `https://findpeoplefast.net/people/${firstname}-${lastname}`;
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
+        await page.goto(`https://findpeoplefast.net/people/${firstname}-${lastname}`)
 
         await page.waitForSelector('.cell');
 
@@ -78,17 +76,26 @@ const webpageURL = `https://findpeoplefast.net/people/${firstname}-${lastname}`;
             let profileList = Array.from(document.querySelectorAll('.cell')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('a')?.textContent?.trim();
-                let link = profile.querySelector('a')?.href;
+                let name = profile.querySelector('div:first-child > div > h2 > *:first-child');
+                if (!name) {
+                    return;
+                } else {
+                    name = name.textContent;
+                }
+                let link = profile.querySelector('div:first-child > div > h2 > a') || null;
+                if (link) {
+                    link = link.href;
+                }
                 let age = Array.from(profile.querySelectorAll('h2'))
                     .find((elem) => elem.textContent.includes('Age'))
-                    ?.textContent?.split('Age')?.[1];
+                    .textContent.split('Age')[1].trim();
                 let address = Array.from(profile.querySelectorAll('span'))
                     .find((elem) => elem.textContent.includes('Lives'))
-                    ?.nextElementSibling
-                    ?.textContent
+                    .nextElementSibling
+                    .textContent;
+
                 res.push({name, age, address, link});
-            })
+            });
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));

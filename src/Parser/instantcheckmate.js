@@ -76,7 +76,7 @@ let state = process.argv[5];
         await page.waitForSelector('#people');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div.person'));
+            let titleNodeList = Array.from(document.querySelectorAll('div.person')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 const nameNode = td.querySelector('li.category.name > h4');

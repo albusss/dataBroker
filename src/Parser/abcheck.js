@@ -75,7 +75,7 @@ const webpageURL = 'https://www.advancedbackgroundchecks.com';
         await page.waitForSelector('#peoplelist2');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.card .card-block'));
+            let titleNodeList = Array.from(document.querySelectorAll('.card .card-block')).slice(0, 10);
             let res = [];
             titleNodeList.map((td, index) => {
                 if (index >= 3) { // skip sponsored

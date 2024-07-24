@@ -73,7 +73,7 @@ let state = process.argv[5];
         await page.waitForSelector('.result-card');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.result-card'));
+            let profileList = Array.from(document.querySelectorAll('.result-card')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
                 let name = profile.querySelector('.card-title').textContent.trim();

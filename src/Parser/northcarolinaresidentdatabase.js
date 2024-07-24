@@ -73,7 +73,7 @@ let state = process.argv[5];
         await page.waitForSelector('#search-results');
 
         const results = await page.evaluate(() => {
-            let profileList = Array.from(document.querySelectorAll('.element'));
+            let profileList = Array.from(document.querySelectorAll('.element')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
                 let name = profile.querySelector('h2[itemprop=name]').textContent.trim();

@@ -76,7 +76,7 @@ let state = process.argv[5];
         await page.waitForSelector('#tbl_ps');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div.card.teaser-card'));
+            let titleNodeList = Array.from(document.querySelectorAll('div.card.teaser-card')).slice(0, 10);
             let res = [];
             titleNodeList.map((td, index) => {
                 const nameNode = td.querySelector('a.card-title');

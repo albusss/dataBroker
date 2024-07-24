@@ -8,7 +8,7 @@ const logger = require('./other/logger');
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-Math.floor(Math.random() * config.proxy.length);
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -72,7 +72,7 @@ let state = process.argv[5];
         let result = await page.evaluate(() => {
             let res = [];
 
-            const voterList = Array.from(document.querySelectorAll('table > tbody > tr'));
+            const voterList = Array.from(document.querySelectorAll('table > tbody > tr')).slice(0, 10);
 
             for (let i = 1; i < voterList.length; i++) {
                 const tr = voterList[i];

@@ -73,7 +73,7 @@ let state = process.argv[5];
         await page.waitForSelector('.person-results-content');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.person-search-result-card'));
+            let titleNodeList = Array.from(document.querySelectorAll('.person-search-result-card')).slice(0, 10);
             let res = [];
             titleNodeList.map(td => {
                 const nameContent = (td.querySelector('h3.person-name').textContent.trim());
