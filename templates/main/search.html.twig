@@ -5,81 +5,142 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container-fluid">
-    <br>
-    <br>
-    <div class="row">
+<div class="container-fluid pt-5">
+    <div class="row mt-5">
         <div class="offset-sm-2 col-sm-8">
             <div class="card">
                 <div class="card-header">
-                    Deletion request for <strong>{{ firstname }} {{ lastname }} in {{ city }},{{ state }}</strong>
+                    Searching request for
+                    <strong>{{ firstname|capitalize }} {{ lastname|capitalize }} in {{ city|capitalize }}, {{ state|upper }}</strong>
+                    among over 300+ data brokers.
                 </div>
+
                 <div class="card-body">
-                    <div class="step-1" style="visibility: hidden">
-                        <span>Collecting all data brokers... </span>
-                        <div class="spinner-border ms-auto spinner-border-sm text-primary" role="status"
-                             aria-hidden="true"></div>
-                        <span style="color: green; visibility: hidden">OK</span>
-                    </div>
-                    <div class="step-2" style="visibility: hidden">
-                        <span>Checking data brokers availability... </span>
-                        <div class="spinner-border ms-auto spinner-border-sm text-primary" role="status"
-                             aria-hidden="true"></div>
-                        <span style="color: green; visibility: hidden">OK</span>
-                    </div>
-                    <div class="step-3" style="visibility: hidden">
-                        <span>Making search requests...</span>
-                        <div class="spinner-border ms-auto spinner-border-sm text-primary" role="status"
-                             aria-hidden="true"></div>
-                        <span style="color: green; visibility: hidden">OK</span>
+                    <div class="invisible" id="step-1">
+                        <span>Collecting all data brokers...</span>
+                        <div class="spinner-border ms-auto spinner-border-sm text-primary"
+                             id="spinner-1"
+                             role="status"
+                             aria-hidden="true"
+                        ></div>
+                        <span class="text-success invisible" id="done-1">OK</span>
                     </div>
 
-                    <br>
-                    <h5 class="card-title">Total progress</h5>
-                    <div class="progress">
-                        <div class="progress-bar bg-info progress-bar-animated progress-bar-striped" role="progressbar"
-                             style="width: 0%">0%
-                        </div>
+                    <div class="invisible" id="step-2">
+                        <span>Checking data brokers availability...</span>
+                        <div class="spinner-border ms-auto spinner-border-sm text-primary"
+                             id="spinner-2"
+                             role="status"
+                             aria-hidden="true"
+                        ></div>
+                        <span class="text-success invisible" id="done-2">OK</span>
+                    </div>
+
+                    <div class="invisible" id="step-3">
+                        <span>Preparing search requests...</span>
+                        <div class="spinner-border ms-auto spinner-border-sm text-primary"
+                             id="spinner-3"
+                             role="status"
+                             aria-hidden="true"
+                        ></div>
+                        <span class="text-success invisible" id="done-3">OK</span>
+                    </div>
+
+                    <div class="invisible" id="step-4">
+                        <span id="header-4">Making a search request for <strong id="data-broker"></strong></span>
+                        <div class="spinner-border ms-auto spinner-border-sm text-primary"
+                             id="spinner-4"
+                             role="status"
+                             aria-hidden="true"
+                        ></div>
+                        <span class="text-success invisible" id="done-4">OK</span>
+                    </div>
+
+                    <h5 class="card-title mt-5">Total progress</h5>
+
+                    <div class="progress" style="height: 25px; font-weight: bold;">
+                        <div class="progress-bar bg-info progress-bar-animated progress-bar-striped"
+                             id="progress-bar"
+                             role="progressbar"
+                             style="width: 0;"
+                        >0%</div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
     <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script>
-        let dashboardPath = '{{ path('dashboard') }}';
         async function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms))
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function randomIndex(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function random(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) ) + min;
         }
 
         async function go() {
-            for (var i = 1; i < 101; i++) {
-                await sleep(50);
-                $(".step-1").css("visibility", "visible");
-                if (i === 30) {
-                    $(".step-1 > .spinner-border").css("visibility", "hidden");
-                    $(".step-1 > span").css("visibility", "visible");
-                    $(".step-2").css("visibility", "visible")
+            const dataBrokers = ["www.advancedbackgroundchecks.com","www.govarrestrecords.org","databaseusa.com","ididata.com","www.openonline.com","www.backgroundchecks.com","infutor.com","modernize.com","www.intellicorp.net","www.allareacodes.com","altisource.com","digitalmediasolutions.com","www.beenverified.com","www.lciinc.com","us.epsilon.com","thatsthem.com","plusaddress.com","publicrecordschecks.com","v12data.com","www.owneriq.com","www.inteligator.com","www.zoominfo.com","www.alc.com","www.phoneregistry.com","businessprofiles.com","www.background-check-only.com","www.corelogic.com","www.peoplefinderonline.net","www.superpages.com","www.transunion.com","infocore.com","www.whitepages.com","www.clarityservices.com","www.mocavo.com","peopleaz.org","www.peoplebyname.com","www.dataamerica.com","www.background-checks-systems.com","www.reversegenie.com","www.verisk.com","studentclearinghouse.org","www.refinitiv.com","www.factualdata.com","www.datatree.com","governmentregistry.org","www.belardiwong.com","www.infogroup.com","ruf.com","www.myyp.com","whitepages.plus","www.700credit.com","www.peopleconnect.us","www.nctue.com","www.tlo.com","www.ypstate.com","www.oracle.com","wiland.com","aslmarketing.com","www.tracersinfoonline.com","www.datafacts.com","members.infotracer.com","www.civisanalytics.com","www.ancestry.com","www.truedata.co","www.searchbug.com","www.corelogic.com","www.detectiveunlimited.com","www.inflection.com","www.verisk.com","www.edvisors.com","www.publicarrestrecords.org","www.cicreports.com","path2response.com","acxiom.com","www.sagestreamllc.com","kw1.knowwho.com","www.peopleconnect.us","www.peopleg2.com","www.speedeondata.com","www.corelogic.com","publicrecords.onlinesearches.com","segment.com","www.viantinc.com","cupidscreen.com","www.cdkglobal.com","mchdata.com","www.census-info.us","blockshopper.com","incheck.net","www.phonebooks.com","www.kbmg.com","www.whoodle.com","www.peekyou.com","www.corelogic.com","analytics-iq.com","reversenumberdatabase.com","strategicinfo.com","risk.lexisnexis.com","www.locatefamily.com","www.kgbpeople.com","www.instantpeoplefinder.com","v2.parasolleads.com","www.peopleconnect.us","lead.co","www.corelogic.com","www.spydialer.com","courtregistry.org","datastreamgroup.com","www.experian.com","www.ancestry.com","www.reversephonelookup.com","www.experian.com","www.experian.com","firstorion.com","www.criminalbackgroundrecords.com","www.advcredit.com","www.hireright.com","www.public-record-site.com","www.411.com","www.marriagerecords.org","www.corporationwiki.com","www.inflection.com","www.goodhire.com","www.i-360.com","www.equifax.com","www.tenantdetective.com","www.emailtracer.com","www.peopleconnect.us","www.voterfactory.com","www.idanalytics.com","secure.publicrecords.com","forewarn.com","reverserecords.org","peopleconnect.us","www.spokeo.com","www.detectiveunlimited.com","www.skipsmasher.com","www.theworknumber.com","www.equifax.com","sortedbyname.com","www.experian.com","www.sterlingcheck.com","www.corelogic.com","www.verisk.com","www.fullcontact.com","www.criminalpages.com","cellphoneregistry.com","www.amrent.com","www.blackbaud.com","revealmobile.com","freebackgroundcheck.us","www.towerdata.com","www.pipl.com","www.equifax.com","www.verisk.com","www.corelogic.com","www.ciccredit.com","deathrecords.org","peoplelookup.com","www.earlywarning.com","info.persopo.com","freecellsearch.com","www.partnerscredit.com","www.truthfinder.com","www.experian.com","www.thomsonreuters.com","intelregistry.com","www.advantagesolutions.net","recordsauthority.com","www.dataverify.com","www.staterecords.org","www.enformion.com","assurance.com","www.reversemobile.com","www.ucc411.com","socialcatfish.com","webbula.com","www.allwebleads.com","publicrecordssearchonline.org","ihsmarkit.com","avrickdirect.com","govregistry.us","www.peoplesmart.com","www.healthcare.com","www.easybackgrounds.com","www.firstdirectmarketing.com","www.courtrecords.org","www.fusedleads.com","www.bisi.com","www.bridgevine.com","www.blackknightinc.com","www.snoopstation.com","www.nationalbackgroundcheck.com","dataxltd.com","www.accudata.com","www.yasni.com","sortedbybirthdate.com","members.infotracer.com","www.instantcheckmate.com","instantbackgroundreport.com","www.infopay.com","www.criminalwatchdog.com","www.libertydata.net","mapsmoji.com","www.valassis.com","www.cbcinnovis.com","www.criminalscreen.com","fi.deluxe.com","www.addresssearch.com","www.compactlists.com","www.possiblenow.com","www.backgroundsonline.com","www.home.neustar","www.datafacts.com","www.cortera.com","www.divorcerecords.org"],
+                  $progressbar = $('#progress-bar');
+
+            let intervalId = null;
+
+            $('#step-1').toggleClass('invisible');
+
+            for (let i = 1; i <= 100; i++) {
+                await sleep(i < 45 ? random(100, 200) : random(300, 400));
+
+                if (i === 15) {
+                    $('#spinner-1').toggleClass('invisible');
+                    $('#done-1').toggleClass('invisible');
+                    $('#step-2').toggleClass('invisible');
                 }
-                if (i === 60) {
-                    $(".step-2 > .spinner-border").css("visibility", "hidden");
-                    $(".step-2 > span").css("visibility", "visible");
-                    $(".step-3").css("visibility", "visible")
+
+                if (i === 35) {
+                    $('#spinner-2').toggleClass('invisible');
+                    $('#done-2').toggleClass('invisible');
+                    $('#step-3').toggleClass('invisible');
                 }
-                if (i === 10 || i === 30 || i === 50) {
-                    await sleep(600)
+
+                if (i === 45) {
+                    $('#spinner-3').toggleClass('invisible');
+                    $('#done-3').toggleClass('invisible');
+                    $('#step-4').toggleClass('invisible');
+
+                    intervalId = setInterval(() => {
+                        $('#data-broker').html(dataBrokers[randomIndex(dataBrokers.length)]);
+                    }, 150);
                 }
-                $(".progress-bar").css("width", i + "%").html(i + "%")
+
+                if (i === 15 || i === 35 || i === 65 || i === 95) {
+                    await sleep(random(500, 1000));
+                }
+
+                $progressbar.css('width', i + '%').html(i + '%');
             }
-            $(".step-3 > .spinner-border").css("visibility", "hidden");
-            $(".step-3 > span").css("visibility", "visible");
-            $(".progress-bar").removeClass("progress-bar-animated").removeClass(" progress-bar-striped");
-            window.location.replace(dashboardPath);
+
+            clearInterval(intervalId);
+
+            $('#header-4').html('Done');
+            $('#spinner-4').toggleClass('invisible');
+            $('#done-4').toggleClass('invisible');
+
+            $progressbar.removeClass('progress-bar-striped');
+            $progressbar.removeClass('progress-bar-animated');
+
+            window.location.replace('{{ path('dashboard') }}');
         }
 
-        $(document).ready(function () {
+        $(document).ready(() => {
             go();
         });
     </script>
