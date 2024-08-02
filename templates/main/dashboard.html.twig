@@ -37,6 +37,16 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard/perfect-scrollbar.css') }}" />
 
     <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ asset('css/jquery-ui.min.css') }}">
+    <style>
+      .ui-dialog-titlebar-close {
+        display: none;
+      }
+
+      .ui-dialog-buttonset > button {
+        border: none;
+      }
+    </style>
 
     <!-- Helpers -->
     <script src="{{ asset('js/dashboard/helpers.js') }}"></script>
@@ -256,14 +266,17 @@
                             <td>{{ item.address|default('-') }}</td>
                             <td>{{ item.age|default('-') }}</td>
                             <td>
-                              {% if item.link != '' and item.link != null %}
-                                <a href="{{ item.link }}" target="_blank">
-                                  <span class="badge bg-label-success me-1">
-                                    Request Deletion
-                                  </span>
-                                </a>
-                              {% endif %}
+{#                              {% if item.link != '' and item.link != null %}#}
+{#                                <a href="{{ item.link }}" target="_blank">#}
+{#                                  <span class="badge bg-label-success me-1">#}
+{#                                    Request Deletion#}
+{#                                  </span>#}
+{#                                </a>#}
+{#                              {% endif %}#}
 {#                              <a href="#" class="delete-btn"><span class="badge bg-label-danger me-1">Delete</span></a>#}
+                                <a href="javascript:void(0)" class="badge bg-label-warning me-1 btn-request-deletion">
+                                    Request Deletion
+                                </a>
                             </td>
                           </tr>
                         {% endfor %}
@@ -285,11 +298,18 @@
         <div class="layout-overlay layout-menu-toggle"></div>
       </div>
     </div>
+
+    <div id="dialog-confirm-deletion" title="REQUEST DELETION">
+      <p class="text-center" style="font-size: larger;">
+        <strong>Are you sure?</strong>
+      </p>
+    </div>
     <!-- / Layout wrapper -->
 
     <!-- Core JS -->
     <!-- build:js assets/vendor/js/core.js -->
-    <script src="{{ asset('js/dashboard/jquery.js') }}"></script>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/jquery-ui.min.js') }}"></script>
     <script src="{{ asset('js/dashboard/popper.js') }}"></script>
     <script src="{{ asset('js/dashboard/bootstrap.js') }}"></script>
     <script src="{{ asset('js/dashboard/perfect-scrollbar.js') }}"></script>
@@ -310,8 +330,24 @@
     <script>
       $(document).ready(function(){
         $(".flash-messages").delay(4000).slideUp(300);
+
+        $('.btn-request-deletion').on('click', () => {
+          $('#dialog-confirm-deletion').dialog({
+            resizable: false,
+            height: 'auto',
+            width: 300,
+            modal: true,
+            buttons: {
+              Yes: function () {
+                $(this).dialog('close');
+              },
+              No: function () {
+                $(this).dialog('close');
+              }
+            }
+          });
+        });
       });
     </script>
-
   </body>
 </html>
