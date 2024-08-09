@@ -23,11 +23,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Service\ParserProxyProvider:
-        arguments:
-            $proxiesDSN: '%env(json:PROXIES_DSN)%'
-
     App\Service\ParserCreator:
         arguments:
+            $proxyServerDsn: '%env(string:TINYPROXY_DSN)%'
             $chromeProfileDir: '%chrome_dir%/profile'
             $chromeUserDataDir: '%chrome_dir%/user-data'

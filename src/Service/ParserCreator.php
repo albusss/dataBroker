@@ -13,9 +13,9 @@ use function class_exists;
 class ParserCreator
 {
     public function __construct(
+        private readonly string $proxyServerDsn,
         private readonly string $chromeProfileDir,
         private readonly string $chromeUserDataDir,
-        private readonly ParserProxyProvider $parserProxyProvider,
     ) {
     }
 
@@ -31,7 +31,7 @@ class ParserCreator
         }
 
         return new $parserClass(
-            $this->parserProxyProvider->provide(),
+            $this->proxyServerDsn,
             $this->chromeProfileDir,
             $this->chromeUserDataDir,
         );
