@@ -33,19 +33,23 @@ RUN apt update && \
     udev \
     xdg-utils
 
-RUN docker-php-ext-install pdo \
+# install php extensions
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN chmod uga+x /usr/local/bin/install-php-extensions && sync
+
+RUN install-php-extensions @composer \
+    pdo \
     pdo_mysql \
     pcntl \
     opcache \
-    zip
+    zip \
+    redis
 
+# install nodejs
 SHELL ["/bin/bash", "--login", "-c"]
 # installs nvm (Node Version Manager)
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 # download and install Node.js
 RUN nvm install 18
-
-RUN wget https://getcomposer.org/installer -O - -q \
-    | php -- --install-dir=/bin --filename=composer --quiet
 
 WORKDIR /var/www

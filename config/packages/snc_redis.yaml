@@ -1,0 +1,12 @@
+snc_redis:
+    clients:
+        request:
+            type: predis
+            alias: request
+            dsn: "%env(REDIS_URL_REQUEST)%"
+            logging: '%kernel.debug%'
+        response:
+            type: predis
+            alias: response
+            dsn: "%env(REDIS_URL_RESPONSE)%"
+            logging: '%kernel.debug%'
