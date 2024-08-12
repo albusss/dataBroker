@@ -1,9 +1,9 @@
-FROM php:8.1.3RC1-fpm
+FROM php:8.1-fpm
 
-# install google-chrome
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y wget \
+# install google-chrome dependencies
+RUN apt update && \
+    apt upgrade -y && \
+    apt install -y wget zip unzip \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -32,17 +32,18 @@ RUN apt-get update && \
     libzip-dev \
     udev \
     xdg-utils
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb
-RUN apt-get install -f
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y tinyproxy
+RUN docker-php-ext-install pdo \
+    pdo_mysql \
+    pcntl \
+    opcache \
+    zip
 
-RUN pecl install xdebug \
-    && docker-php-ext-install zip pdo pdo_mysql pcntl opcache \
-    && docker-php-ext-enable xdebug
+SHELL ["/bin/bash", "--login", "-c"]
+# installs nvm (Node Version Manager)
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+# download and install Node.js
+RUN nvm install 18
 
 RUN wget https://getcomposer.org/installer -O - -q \
     | php -- --install-dir=/bin --filename=composer --quiet
