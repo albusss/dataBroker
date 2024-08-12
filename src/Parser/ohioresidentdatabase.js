@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = `https://www.ohioresidentdatabase.com/name/${firstname}-${lastname}`;
 
 (async () => {
     try {
@@ -73,25 +68,26 @@ const webpageURL = `https://www.ohioresidentdatabase.com/name/${firstname}-${las
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
+        await page.goto(`https://www.ohioresidentdatabase.com/name/${firstname}-${lastname}`);
+
         await page.waitForSelector('#search-results');
 
         const results = await page.evaluate(() => {
             let profileList = Array.from(document.querySelectorAll('a')).filter((elem) => !elem.textContent.includes('View Details')).slice(5, 10);
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector("h3[itemprop=name]")?.textContent;
+                let name = profile.querySelector("h3[itemprop=name]").textContent;
                 let body = profile.nextElementSibling;
                 const age = Array.from(body.querySelectorAll('p'))
                     .find((elem) => elem.textContent.includes('Age'))
-                    ?.textContent?.replace('Age:', '')
-                let address = body.querySelector('span[itemprop=streetAddress]')?.textContent?.trim() + 
-                    ', ' + body.querySelector('span[itemprop=addressLocality]')?.textContent?.trim() +
-                    ', ' + body.querySelector('span[itemprop=postalCode]')?.textContent?.trim() +
-                    ', ' + body.querySelector('span[itemprop=addressRegion]')?.textContent?.trim()
+                    .textContent.replace('Age:', '')
+                let address = body.querySelector('span[itemprop=streetAddress]').textContent.trim() + 
+                    ', ' + body.querySelector('span[itemprop=addressLocality]').textContent.trim() +
+                    ', ' + body.querySelector('span[itemprop=postalCode]').textContent.trim() +
+                    ', ' + body.querySelector('span[itemprop=addressRegion]').textContent.trim()
                 let link = Array.from(body.querySelectorAll('a'))
                     .find((elem) => elem.textContent.includes('View Details'))
-                    ?.href;
+                    .href;
                 res.push({name, address, link, age});
             })
             return res;

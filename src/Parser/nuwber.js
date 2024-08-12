@@ -3,14 +3,11 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -18,14 +15,12 @@ let state = process.argv[5];
 
 // John Smith Jasper IN
 
-const webpageURL = 'https://nuwber.com/';
-
 (async () => {
     try {
 
         browser = await puppeteer.launch({
             slowMo: 100,
-            headless: false,
+            headless: true,
             devtools: true,
             args: [
                 '--proxy-server=' + config.proxy[proxyNumber].host,
@@ -74,35 +69,29 @@ const webpageURL = 'https://nuwber.com/';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
-        await page.waitForSelector('#blocker')
-        // await page.waitForSelector('#form-search-name')
-        // await page.type('#search-name-name', firstname+' '+lastname);
-        // // await page.type('#search-name-address', location);
-        // await page.keyboard.press('Enter');
+        await page.goto(`https://nuwber.com/search?name=${firstname}%20${lastname}&location=${city}%2C%20${state}`);
 
-        // // await page.waitForSelector('#blocker-selector');
+        await page.waitForSelector('.result-block');
 
-        // await page.waitForSelector('#peoplelist2');
+        const results = await page.evaluate(() => {
+            let titleNodeList = Array.from(document.querySelectorAll('.result-block .result-block-head-text')).slice(0, 10);
+            let res = [];
+            titleNodeList.map(td => {
+                let name = td.querySelector('h2 > a') || null;
+                if (!name) {
+                    return;
+                } else {
+                    name = name.textContent.trim();
+                }
+                const age = td.querySelector('span').textContent.replace('Age ', '').trim();
+                const location = td.querySelector('p').textContent.trim();
+                const link = td.querySelector('h2 > a').href;
 
-        // const results = await page.evaluate(() => {
-        //     let titleNodeList = Array.from(document.querySelectorAll('#peoplelist2 > div.card'));
-        //     let res = [];
-        //     titleNodeList.map((td, index) => {
-        //         if (index >= 3) { // skip sponsored
-        //             const nameContent = (td.querySelector('div > h4').textContent.trim())
-        //             const name = nameContent.slice(0, nameContent.indexOf('Age'));
-        //             const age = td.querySelector('div > h4 > span').textContent.trim();
-        //             const location = td.querySelector('div > p:nth-child(2)').textContent.trim();
-        //             const linkContent = (td.querySelector('div > a.link-to-details')).getAttribute('href');
-        //             const link = linkContent[0] === '/' ? 'https://www.advancedbackgroundchecks.com' + linkContent : linkContent;
-        //             res.push({name, age, location, link});
-        //         }
-        //     });
-        //     return res;
-        // });
-        // // console.log(results);
-        // console.log(JSON.stringify({message: results, error: null}));
+                res.push({name, age, location, link});
+            });
+            return res;
+        });
+        console.log(JSON.stringify({message: results, error: null}));
     } catch(e){
         console.log(JSON.stringify({message: null, error: e.message}));
     } finally {

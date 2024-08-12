@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// 0 - cheaper proxy, 1 - expensive proxy
-// let proxyNumber = funcs.randomInt(0, 1);
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -70,25 +67,33 @@ let state = process.argv[5];
         });
 
         await page.goto(`https://www.truepeoplesearch.com/results?Name=${firstname}+${lastname}&CityStateZip=${city}+${state}&PhoneNo=&StreetAddress=&CityStateZip=`);
+
         await page.waitForSelector('.card');
 
         let results = await page.evaluate(() => {
             let res = [];
-            let nodeList = Array.from(document.querySelectorAll('.card')).slice(0, 10);
-
+            let nodeList = Array.from(document.querySelectorAll('.card > .row:first-child')).slice(0, 10);
             nodeList.forEach((node) => {
-                const name = node.querySelector('.h4')?.textContent?.replace('\n', '');
-                const age = Array.from(node.querySelectorAll('.content-label'))
-                    .find((elem) => elem.textContent?.includes('Age'))
-                    ?.nextElementSibling
-                    ?.textContent?.replace('\n', '');
-                const location = Array.from(node.querySelectorAll('.content-label'))
-                .find((elem) => elem.textContent?.includes('Lives in'))
-                ?.nextElementSibling
-                ?.textContent;
+                let name = node.querySelector('.h4');
+                if (!name) {
+                    return;
+                } else {
+                    name = name.textContent.trim();
+                }
+                let age = Array.from(node.querySelectorAll('.content-label'))
+                    .find((elem) => elem.textContent.includes('Age')) || null;
+                if (age) {
+                    age = age.nextElementSibling.textContent.trim();
+                }
+                let location = Array.from(node.querySelectorAll('.content-label'))
+                    .find((elem) => elem.textContent.includes('Lives in')) || null;
+                if (location) {
+                    location = location.nextElementSibling.textContent.trim();
+                }
                 const link = 'https://www.truepeoplesearch.com' + node.getAttribute('data-detail-link');
-                res.push({name, age, location, link})
-            })
+
+                res.push({name, age, location, link});
+            });
             return res;
         });
         console.log(results);

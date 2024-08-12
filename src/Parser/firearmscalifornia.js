@@ -3,28 +3,23 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = `https://www.firearmscalifornia.org/licenses?q=${firstname}+${lastname}`;
 
 (async () => {
     try {
 
         browser = await puppeteer.launch({
             slowMo: 100,
-            headless: false,
+            headless: true,
             devtools: true,
             args: [
                 '--proxy-server=' + config.proxy[proxyNumber].host,
@@ -73,7 +68,7 @@ const webpageURL = `https://www.firearmscalifornia.org/licenses?q=${firstname}+$
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
+        await page.goto(`https://www.firearmscalifornia.org/licenses?q=${firstname}+${lastname}`);
 
         await page.waitForSelector('.results-list');
 
@@ -81,9 +76,9 @@ const webpageURL = `https://www.firearmscalifornia.org/licenses?q=${firstname}+$
             let profileList = Array.from(document.querySelectorAll('.inside')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('a')?.textContent?.trim();
-                let address = profile.querySelector('span.pin')?.textContent?.trim();
-                let link = profile.querySelector('a')?.href;
+                let name = profile.querySelector('a').textContent.trim();
+                let address = profile.querySelector('span.pin').textContent.trim();
+                let link = profile.querySelector('a').href;
                 res.push({name, address, link});
             })
             return res;

@@ -3,23 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-// John Smith Jasper IN
-
-const webpageURL = 'https://www.beenverified.com/app/optout/search';
 
 (async () => {
     try {
@@ -75,23 +68,21 @@ const webpageURL = 'https://www.beenverified.com/app/optout/search';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(`https://www.beenverified.com/app/search/person?fname=${firstname}&ln=${lastname}&optout=true&state=${state}`)
+        await page.goto(`https://www.beenverified.com/app/search/person?city=${city}&fname=${firstname}&ln=${lastname}&optout=true&state=${state}`);
 
-        await page.waitForSelector('#static-wrapper-v2');
-        await page.waitForSelector('div.card-content');
+        await page.waitForSelector('.person-results-content');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('div.card-content'));
+            let titleNodeList = Array.from(document.querySelectorAll('.person-search-result-card')).slice(0, 10);
             let res = [];
-            titleNodeList.map((td, index) => {
-                if (index >= 3) { // skip sponsored
-                    const nameContent = (td.querySelector('h3.person-name').textContent.trim());
-                    const nameAge = nameContent.split(',');
-                    const name = nameAge[0] ? nameAge[0].trim() : '';
-                    const age = nameAge[1] ? nameAge[1].trim() : '';
-                    const location = (td.querySelector('p.person-city')).textContent.trim();
-                    res.push({name, age, location});
-                }
+            titleNodeList.map(td => {
+                const nameContent = (td.querySelector('h3.person-name').textContent.trim());
+                const nameAge = nameContent.split(',');
+                const name = nameAge[0] ? nameAge[0].trim() : '';
+                const age = nameAge[1] ? nameAge[1].trim() : '';
+                const location = (td.querySelector('p.person-city')).textContent.trim();
+
+                res.push({name, age, location});
             });
             return res;
         });

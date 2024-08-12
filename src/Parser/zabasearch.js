@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -68,23 +65,22 @@ let state = process.argv[5];
             }
         });
 
-
         await page.authenticate({
             username: config.proxy[proxyNumber].user,
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(`https://www.zabasearch.com/people/${firstname}+${lastname}/${city}+${state}/`)
+        await page.goto(`https://www.zabasearch.com/people/${firstname}-${lastname}/${state}/${city}/`);
 
-        await page.waitForSelector('div.sub-container');
+        await page.waitForSelector('div#container-result');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.person.people-results'));
+            let titleNodeList = Array.from(document.querySelectorAll('#container-result > .person > section:first-child')).slice(0, 10);
             let res = [];
-            titleNodeList.map((td, index) => {
-                const nameNode = td.querySelector('a.name-link');
-                const ageNode = td.querySelector('div.person-info > p');
-                const locationNode = td.querySelector('div.person-info > p + p');
+            titleNodeList.map(td => {
+                const nameNode = td.querySelector('#container-name a');
+                const ageNode = td.querySelector('#container-name + div > h3');
+                const locationNode = td.querySelector('div.section-box:nth-last-child(2) > div > div > p:first-child');
 
                 const name = nameNode ? nameNode.textContent.trim() : '';
                 const link = nameNode? nameNode.href : '';

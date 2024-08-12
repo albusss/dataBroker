@@ -1,24 +1,23 @@
-const fs = require('fs');
-const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
+const fs = require("fs");
+const path = require("path");
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// 0 - cheaper proxy, 1 - expensive proxy
-// let proxyNumber = funcs.randomInt(0, 1);
-let proxyNumber = 1;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
 
+puppeteer.use(StealthPlugin());
+
 (async () => {
     try {
+
         browser = await puppeteer.launch({
             slowMo: 100,
             headless: true,
@@ -32,11 +31,13 @@ let state = process.argv[5];
             ],
         });
 
-        page = await browser.newPage();
+        page = await browser.newPage()
+
         await page.setJavaScriptEnabled(true);
         await page.setDefaultNavigationTimeout(0);
-        await page.setDefaultTimeout(30000);
+        await page.setDefaultTimeout(60000 * 10);
         await page.setRequestInterception(true);
+
         await page.setViewport({
             width: 1920 + Math.floor(Math.random() * 100),
             height: 3000 + Math.floor(Math.random() * 100),
@@ -67,41 +68,30 @@ let state = process.argv[5];
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto('https://www.fastpeoplesearch.com/name/'+firstname+'-'+lastname+'_'+city+'-'+state)
-        await page.waitForSelector('div.people-list')
+        await page.goto(`https://www.floridaresidentsdirectory.com/name/${firstname}-${lastname}`);
 
-        const results = await page.evaluate(() => {
+        await page.waitForSelector('#search-results')
+
+        let result = await page.evaluate(() => {
+            let titleNodeList = document.querySelectorAll('.row.bb.element');
             let res = [];
-            let allProfileList = Array.from(document.querySelectorAll('div.people-list div.card'));
-            if(!allProfileList.length) {
-                return res;
-            }
-            let profileList = allProfileList.slice(0, 10);
-            profileList.map(td => {
-                let link = td.querySelector('h2.card-title a').getAttribute('href')
-                let name = td.querySelector('h2.card-title span.larger').textContent;
-                let location = td.querySelector('div strong a').textContent.split(/\r?\n/)[0]
-                var age     = false;
-                var patt    = /<h3>Age:<\/h3>([^"']*)<br>/g;
-                while (match = patt.exec(td.outerHTML)) {
-                    age = match[1];
+            for (let i = 0; i < titleNodeList.length; i++) {
+                if (i > 10) {
+                    break;
                 }
-                if(age) {
-                    age = age.split('<br>')[0].trim()
-                }
-
-                res.push({
+                let name = titleNodeList[i].querySelector('div a h3').innerText;
+                res[i] = {
                     name: name,
-                    link: 'https://www.fastpeoplesearch.com/' + link,
-                    location: location.trim(),
-                    age: age
-                });
-            });
+                    age: titleNodeList[i].querySelector('div div div p:nth-child(1)').innerText.replace(/\D/g, ""),
+                    address: titleNodeList[i].querySelector('div div div p:nth-child(2) span').innerText,
+                    link: titleNodeList[i].querySelector('div a').getAttribute('href'),
+                };
+            }
             return res;
         });
 
-        console.log(JSON.stringify({message: results, error: null}));
-    } catch (e) {
+        console.log(JSON.stringify({message: result, error: null}));
+    } catch(e){
         console.log(JSON.stringify({message: null, error: e.message}));
         logger.error(JSON.stringify(e, Object.getOwnPropertyNames(e)));
     } finally {

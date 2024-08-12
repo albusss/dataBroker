@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = 'https://freepeopledirectory.com';
 
 (async () => {
     try {
@@ -73,11 +68,7 @@ const webpageURL = 'https://freepeopledirectory.com';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(webpageURL)
-        await page.waitForSelector('#form-submit')
-        await page.type('#fname', firstname);
-        await page.type('#lname', lastname);
-        await page.click('#submit-button');
+        await page.goto(`https://freepeopledirectory.com/name/${firstname}-${lastname}`);
 
         await page.waitForSelector('.result-card');
 
@@ -85,9 +76,10 @@ const webpageURL = 'https://freepeopledirectory.com';
             let profileList = Array.from(document.querySelectorAll('.result-card')).slice(0, 10);
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('.card-title')?.textContent?.trim();
-                let address = profile.querySelector('.city')?.textContent?.trim();
-                let link = profile.querySelector('a.card')?.href;
+                let name = profile.querySelector('.card-title').textContent.trim();
+                let address = profile.querySelector('.city').textContent.trim();
+                let link = profile.querySelector('a.card').href;
+
                 res.push({name, address, link});
             })
             return res;

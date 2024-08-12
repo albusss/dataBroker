@@ -3,22 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-// John Smith Jasper IN
-// div.card.teaser-card
 
 (async () => {
     try {
@@ -40,7 +34,7 @@ let state = process.argv[5];
 
         await page.setJavaScriptEnabled(true);
         await page.setDefaultNavigationTimeout(0);
-        await page.setDefaultTimeout(60000 * 10);
+        await page.setDefaultTimeout(30000 * 3);
         await page.setRequestInterception(true);
 
         await page.setViewport({
@@ -74,25 +68,24 @@ let state = process.argv[5];
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(`https://www.spokeo.com/${firstname}-${lastname}/${state}/${city}?loaded=1`)
+        await page.goto(`https://persontrust.com/ng/profile/search?fname=${firstname}&lname=${lastname}&state=${state}&city=${city}`);
 
-        await page.waitForSelector('.list-view');
+        await page.waitForSelector('.tm-people-search');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.single-column-list-item'));
+            let profileList = Array.from(document.querySelectorAll('.tm-search-item')).slice(0, 10);
             let res = [];
-            titleNodeList.map((td, index) => {
-                const nameAndAgeNode = td.querySelector('.title');
-                const locationNode = td.querySelector('div > strong');
+            profileList.forEach((profile) => {
+                let link = profile.href;
+                let name = profile.querySelector('span[itemprop=givenName]').textContent.trim()
+                     + ' ' + profile.querySelector('span[itemprop=familyName]').textContent.trim();
+                let age = Array.from(profile.querySelectorAll('.age'))
+                    .find((elem) => elem.textContent.includes('Age'))
+                    .textContent.replace('Age: ', '').trim();
+                let address = profile.querySelector("span[itemprop=address]").textContent.trim();
 
-                const nameAndAge = nameAndAgeNode ? nameAndAgeNode.textContent.trim().split(',') : [];
-                const name = nameAndAge[0] ? nameAndAge[0].trim() : '';
-                const age = nameAndAge[1] ? nameAndAge[1].trim() : '';
-                const location = locationNode ? locationNode.textContent.trim() : '';
-                const link = td.href;
-
-                res.push({name, age, location, link}); 
-            });
+                res.push({name, address, link, age});
+            })
             return res;
         });
         console.log(JSON.stringify({message: results, error: null}));

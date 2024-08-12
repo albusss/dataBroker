@@ -3,15 +3,12 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
@@ -79,9 +76,9 @@ let state = process.argv[5];
         await page.waitForSelector('#people');
 
         const results = await page.evaluate(() => {
-            let titleNodeList = Array.from(document.querySelectorAll('.person.highly-likely'));
+            let titleNodeList = Array.from(document.querySelectorAll('.person.highly-likely')).slice(0, 10);
             let res = [];
-            titleNodeList.map((td, index) => {
+            titleNodeList.map(td => {
                 const nameNode = td.querySelector('.link-name');
                 const locationNode = td.querySelector('.address');
                 const ageNode = td.querySelector('.display-age');

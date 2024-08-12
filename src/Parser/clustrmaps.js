@@ -3,21 +3,16 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const link = 'https://clustrmaps.com';
 
 (async () => {
     try {
@@ -70,36 +65,36 @@ const link = 'https://clustrmaps.com';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(link);
-        await page.waitForSelector('#main-people-form > div.form-input > input[type=text]');
-        await page.type('#main-people-form > div.form-input > input[type=text]', firstname + ' ' + lastname);
-        await page.keyboard.press('Enter');
-        await page.waitForSelector('.container')
-        let result = await page.evaluate((link) => {
-            let titleNodeList = document.querySelectorAll('.container > .row > .col-12 > .row > .col-md-8 > div.mb-5');
+        await page.goto(`https://clustrmaps.com/persons/${firstname}-${lastname}`);
+
+        // require select an suggestion item and click
+        // await page.goto('https://clustrmaps.com');
+        //
+        // await page.waitForSelector('div.deep-search-div');
+        // await page.type('div.deep-search-div input[type=text]', firstname + ' ' + lastname);
+        // await page.keyboard.press('Enter');
+
+        await page.waitForSelector('div[itemprop=Person]');
+
+        let results = await page.evaluate(() => {
+            let titleNodeList = Array.from(document.querySelectorAll('div[itemprop=Person]')).slice(0, 10);
+
             let res = [];
-            for (let i = 0; i < titleNodeList.length; i++) {
-                if (i > 10) {
-                    break;
-                }
-                let name = titleNodeList[i].querySelector('.mb-5 > .d-flex > .h4 > a > span').textContent;
+            titleNodeList.map(node => {
+                let name = node.querySelector('span[itemprop=name]').textContent.trim();
                 let age = ' ';
-                let agenode = titleNodeList[i].querySelector('span.age');
+                let agenode = node.querySelector('span.age');
                 if(agenode) {
                     age = agenode.textContent.replace(', age', '').trim();
                 }
+                let link = node.querySelector('a.persons').href;
+                let location = node.querySelector('div[itemprop=address] > a').textContent.trim();
 
-                res[i] = {
-                    name: name,
-                    link: link + titleNodeList[i].querySelector('.mb-5 > .d-flex > .h4 > a').getAttribute('href'),
-                    location: titleNodeList[i].querySelector('.mb-5 > .mb-1 > a > span').textContent,
-                    age: age
-                    };
-            }
+                res.push({name, age, link, location});
+            });
             return res;
-        }, link);
-
-        console.log(JSON.stringify({message: result, error: null}));
+        });
+        console.log(JSON.stringify({message: results, error: null}));
     } catch(e){
         console.log(JSON.stringify({message: null, error: e.message}));
         logger.error(JSON.stringify(e, Object.getOwnPropertyNames(e)));

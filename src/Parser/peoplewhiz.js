@@ -3,28 +3,23 @@ const path = require('path');
 const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const funcs = require('./functions');
 const logger = require('./other/logger');
 
 let rawdata = fs.readFileSync(path.resolve(__dirname, './config.json'));
 let config = JSON.parse(rawdata);
 let browser, page;
-// let proxyNumber = funcs.randomInt(0, 1);
-// 0 - cheaper proxy, 1 - expensive proxy
-let proxyNumber = 0;
+let proxyNumber = Math.floor(Math.random() * config.proxy.length);
 let firstname = process.argv[2];
 let lastname = process.argv[3];
 let city = process.argv[4];
 let state = process.argv[5];
-
-const webpageURL = 'https://www.peoplewhiz.com/';
 
 (async () => {
     try {
 
         browser = await puppeteer.launch({
             slowMo: 100,
-            headless: false,
+            headless: true,
             devtools: true,
             args: [
                 '--proxy-server=' + config.proxy[proxyNumber].host,
@@ -73,18 +68,19 @@ const webpageURL = 'https://www.peoplewhiz.com/';
             password: config.proxy[proxyNumber].pass
         });
 
-        await page.goto(`https://www.peoplewhiz.com/hflow/searching/${firstname}/~/${lastname}/${city}/${state}/~`)
+        await page.goto(`https://www.peoplewhiz.com/hflow/results/${firstname}/~/${lastname}/${city}/${state}/~`);
 
         await page.waitForSelector('.results-table-desktop');
 
         const results = await page.evaluate(() => {
             let resultTable = document.querySelector('.results-table-desktop');
-            let profileList = Array.from(resultTable.querySelectorAll('tr')).slice(0, 10);
+            let profileList = Array.from(resultTable.querySelectorAll('tr'));
             let res = [];
             profileList.forEach((profile) => {
-                let name = profile.querySelector('.name')?.textContent?.trim();
-                let address = profile.querySelector('.address')?.textContent?.trim();
-                let age = profile.querySelector('.age')?.textContent?.trim();
+                let node;
+                let name = (node = profile.querySelector('.name')) ? node.textContent.trim() : null;
+                let address = (node = profile.querySelector('.address')) ? node.textContent.trim() : null;
+                let age = (node = profile.querySelector('.age')) ? node.textContent.trim() : null;
                 res.push({name, address, age})
             })
             return res;
