@@ -12,3 +12,6 @@ mysql:
 
 migrations-up:
 	docker-compose -f ./docker-compose.yml --env-file ./.env exec -it --user root php ./bin/console doctrine:migrations:migrate --no-interaction
+
+nodejs:
+	docker-compose -f ./docker-compose.yml --env-file ./.env run -it --user root nodejs /bin/bash

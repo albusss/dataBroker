@@ -1,4 +1,14 @@
 services:
+    nodejs:
+        container_name: nodejs
+        build: ./.docker/nodejs
+        depends_on:
+            - php
+        ports:
+            - '8888:8888'
+        volumes:
+            - './:/var/www/'
+
     redis:
         container_name: redis
         image: redis
